@@ -776,7 +776,8 @@
   // ---------- 이벤트 ----------
   function initUI() {
     document.title = C.title || "마작 대회";
-    $("#site-title").textContent = C.title || "마작 대회";
+    // 헤더 제목은 단어마다 줄을 나눠 세로로 쌓음 (COD / Mahjong / League)
+    $("#site-title").innerHTML = (C.title || "마작 대회").split(/\s+/).map((w) => `<span>${esc(w)}</span>`).join("");
     $("#site-subtitle").textContent = C.subtitle || "";
     $("#footer-title").textContent = C.title || "마작 대회";
 

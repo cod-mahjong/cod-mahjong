@@ -44,7 +44,9 @@ button { font-family: inherit; }
   padding: 22px 24px;
 }
 .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #000; flex-shrink: 0; }
-.logo { gap: 12px; }
+.logo { gap: 10px; }
+#site-title { font-size: 13px; line-height: 1.08; letter-spacing: .3px; }
+#site-title span { display: block; }
 .logo-mark { height: 40px; width: auto; display: block; }
 .footer-mark { height: 56px; width: auto; display: block; margin: 0 auto 14px; filter: invert(1); }
 .logo-text {
