@@ -375,6 +375,17 @@ body.admin .admin-link { color: #fff; border-color: var(--green); background: va
 .admin-form input:focus { outline: none; border-color: var(--green); }
 .admin-error { color: var(--red); font-size: 13px; margin: 0; min-height: 1em; }
 
+.ask-body { padding: 20px 22px 22px; }
+.ask-msg { margin: 0 0 16px; white-space: pre-line; line-height: 1.7; font-size: 15px; }
+.ask-input {
+  width: 100%; font: inherit; font-size: 16px; padding: 11px 14px; margin-bottom: 16px;
+  border-radius: 8px; border: 2px solid var(--line);
+}
+.ask-input:focus { outline: none; border-color: var(--green); }
+.ask-actions { display: flex; gap: 10px; justify-content: flex-end; }
+.btn.danger { background: var(--red); border-color: var(--red); }
+.btn.danger:hover { background: #a80016; border-color: #a80016; }
+
 .save-box { margin-top: 18px; padding: 16px; border: 2px dashed var(--green); border-radius: 12px; }
 .save-title { font-weight: 900; font-size: 14px; color: var(--green-dark); margin-bottom: 10px; }
 .save-row { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }

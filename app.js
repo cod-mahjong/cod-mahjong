@@ -572,6 +572,43 @@
     showDialog("#player-modal");
   }
 
+  /**
+   * 확인/입력 창. 브라우저 기본 confirm()·prompt()는 카카오톡 인앱 브라우저나
+   * "대화상자 차단" 설정에서 아무것도 안 띄우고 바로 취소되므로, 페이지 안의 창을 씀.
+   * 확인 → true(입력 모드면 입력값), 취소 → false(입력 모드면 null)
+   */
+  function ask({ title, message = "", okText = "확인", danger = false, input = false, placeholder = "" }) {
+    return new Promise((resolve) => {
+      const dlg = $("#ask-modal");
+      const inp = $("#ask-input");
+      const ok = $("#ask-ok");
+      $("#ask-title").textContent = title;
+      $("#ask-msg").textContent = message;
+      ok.textContent = okText;
+      ok.classList.toggle("danger", danger);
+      inp.classList.toggle("hidden", !input);
+      inp.value = "";
+      inp.placeholder = placeholder;
+
+      let done = false;
+      const finish = (val) => {
+        if (done) return;
+        done = true;
+        ok.onclick = $("#ask-cancel").onclick = inp.onkeydown = null;
+        if (dlg.open) dlg.close();
+        resolve(val);
+      };
+      const cancelVal = input ? null : false;
+      ok.onclick = () => finish(input ? inp.value.trim() || null : true);
+      $("#ask-cancel").onclick = () => finish(cancelVal);
+      inp.onkeydown = (e) => { if (e.key === "Enter") { e.preventDefault(); ok.click(); } };
+      dlg.addEventListener("close", () => finish(cancelVal), { once: true });
+
+      showDialog("#ask-modal");
+      (input ? inp : ok).focus();
+    });
+  }
+
   /** 다른 창은 닫고 해당 창만 띄우기 */
   function showDialog(sel) {
     $$("dialog[open]").forEach((d) => d.close());
@@ -620,10 +657,17 @@
 
     $$("#tab-calc input").forEach((inp) => inp.addEventListener("input", runCalc));
     $$(".name-sel").forEach((sel) =>
-      sel.addEventListener("change", () => {
+      sel.addEventListener("change", async () => {
         if (sel.value === NEW_PLAYER) {
           // 운영자 모드 전용: 아직 기록이 없는 새 선수 추가
-          const name = (window.prompt("새 선수 이름을 입력하세요 (대국 기록과 똑같이 써야 같은 사람으로 집계돼요)") || "").trim();
+          sel.value = "";
+          const name = (await ask({
+            title: "새 선수 추가",
+            message: "이름을 입력하세요.\n대국 기록과 띄어쓰기까지 똑같이 써야 같은 사람으로 집계돼요.",
+            okText: "추가",
+            input: true,
+            placeholder: "선수 이름",
+          })) || "";
           if (name && !state.extraNames.includes(name) && !state.all.some((s) => s.name === name)) {
             state.extraNames.push(name);
           }
@@ -891,7 +935,12 @@
     const d = parseDate(date);
     const lines = players.map((p, i) => `${SEATS[i]} ${p.name}  ${fmtScore(p.score)}`).join("\n");
     const warn = sum !== total ? `\n\n⚠ 점수 합계가 ${fmtScore(sum)}이에요 (기준 ${fmtScore(total)}).` : "";
-    if (!window.confirm(`${d ? dateLabel(d) : date} 기록을 시트에 저장할까요?\n\n${lines}${warn}`)) return;
+    const okSave = await ask({
+      title: "기록 저장",
+      message: `${d ? dateLabel(d) : date} 기록을 시트에 저장할까요?\n\n${lines}${warn}`,
+      okText: "저장",
+    });
+    if (!okSave) return;
 
     const btn = $("#save-game");
     btn.disabled = true;
@@ -923,7 +972,13 @@
     if (!g || g.pending || !state.admin) return;
     const names = [...g.players].sort((a, b) => a.rank - b.rank)
       .map((p) => `${p.rank}위 ${p.name} ${fmtScore(p.score)}`).join("\n");
-    if (!window.confirm(`${g.label} ${g.no}게임 기록을 시트에서 삭제할까요?\n되돌릴 수 없어요.\n\n${names}`)) return;
+    const okDel = await ask({
+      title: "기록 삭제",
+      message: `${g.label} ${g.no}게임 기록을 시트에서 삭제할까요?\n되돌릴 수 없어요.\n\n${names}`,
+      okText: "삭제",
+      danger: true,
+    });
+    if (!okDel) return;
     try {
       await api("delete", { row: g.row, players: g.raw });
       const fp = fingerprint(g.raw);
