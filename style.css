@@ -87,10 +87,8 @@ button { font-family: inherit; }
 /* ---------- Hero (회색 패턴 + 카드) ---------- */
 .hero {
   background-color: #ececec;
-  /* COD 글자 패턴 (img/cod-pattern.svg) */
-  background-image: url("img/cod-pattern.svg?v=3");
-  background-size: 480px 380px;
-  background-position: center top;
+  /* 간단한 육각형 패턴 */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='104' viewBox='0 0 120 104'%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='10' opacity='.55'%3E%3Cpath d='M30 4 L58 20 L58 52 L30 68 L2 52 L2 20 Z'/%3E%3Cpath d='M90 56 L118 72 L118 104'/%3E%3Cpath d='M90 56 L62 72 L62 104'/%3E%3Cpath d='M90 -48 L118 -32 L118 0 L90 16 L62 0'/%3E%3C/g%3E%3C/svg%3E");
   padding: 40px 0 48px;
 }
 .hero-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
@@ -454,7 +452,7 @@ body.admin .admin-link { color: #fff; border-color: var(--green); background: va
   .gnav { justify-content: space-between; }
   .tab { padding: 8px 6px; font-size: 14px; }
   .tab::after { left: 6px; right: 6px; }
-  .hero { padding: 26px 0 30px; background-size: 288px 228px; }
+  .hero { padding: 26px 0 30px; }
   .hero-inner { padding: 0 16px; }
   .podium { grid-template-columns: 1fr 1.15fr 1fr; gap: 8px; }
   .pcard.slot1 { min-height: 200px; margin-bottom: 10px; }
