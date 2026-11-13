@@ -639,7 +639,7 @@
   }
 
   // ---------- 선수 창 그래프 (최근 RECENT_N국) ----------
-  const RECENT_N = 15;
+  const RECENT_N = 10;
   // 휴대폰에선 폭을 좁게 그려서 글자가 작아지지 않게
   const CH = { W: 560, L: 46, R: 16 };
   const fitChart = () => { CH.W = window.innerWidth < 600 ? 360 : 560; };
