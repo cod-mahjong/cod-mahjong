@@ -101,7 +101,17 @@ button { font-family: inherit; }
 }
 .refresh:hover { color: var(--green); }
 
-.podium { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+/* 시상대: 2위(왼쪽) · 1위(가운데, 크고 살짝 위) · 3위(오른쪽) */
+.podium {
+  display: grid; grid-template-columns: 1fr 1.18fr 1fr; gap: 20px;
+  align-items: end; max-width: 1000px; margin: 0 auto;
+}
+.pcard.slot2 { order: 1; }
+.pcard.slot1 { order: 2; min-height: 330px; margin-bottom: 18px; box-shadow: 0 8px 26px rgba(0,0,0,.12); }
+.pcard.slot3 { order: 3; }
+.pcard.slot1 .pcard-rank { font-size: 112px; }
+.pcard.slot1 .pcard-name { font-size: 26px; }
+.pcard.slot1 .pcard-x { width: 130px; height: 130px; }
 .pcard {
   background: #fff; border-radius: 20px; overflow: hidden; cursor: pointer;
   display: flex; flex-direction: column; min-height: 280px;
@@ -443,7 +453,11 @@ body.admin .admin-link { color: #fff; border-color: var(--green); background: va
   .tab::after { left: 6px; right: 6px; }
   .hero { padding: 26px 0 30px; }
   .hero-inner { padding: 0 16px; }
-  .podium { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .podium { grid-template-columns: 1fr 1.15fr 1fr; gap: 8px; }
+  .pcard.slot1 { min-height: 200px; margin-bottom: 10px; }
+  .pcard.slot1 .pcard-rank { font-size: 62px; }
+  .pcard.slot1 .pcard-name { font-size: 17px; }
+  .pcard.slot1 .pcard-x { width: 70px; height: 70px; }
   .pcard { min-height: 170px; border-radius: 14px; }
   .pcard-body { padding: 14px 4px 0; }
   .pcard-rank { font-size: 52px; }
