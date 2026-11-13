@@ -423,18 +423,24 @@
 
   function renderBoards() {
     const el = $("#boards");
-    if (!state.ranking.length) { el.innerHTML = `<div class="empty" style="grid-column:1/-1">아직 기록이 없어요.</div>`; return; }
+    // 한 판이라도 친 선수는 모두 포함. 배치 중인 선수는 순위 번호 없이 회색으로 (종합 랭킹과 같은 규칙)
+    const players = state.all.filter((s) => s.games > 0);
+    if (!players.length) { el.innerHTML = `<div class="empty" style="grid-column:1/-1">아직 기록이 없어요.</div>`; return; }
     const rankBy = (arr, key) => {
       const sorted = [...arr].sort((a, b) => b[key] - a[key] || b.games - a.games);
       let prev = null;
-      return sorted.map((s, i) => {
-        const place = prev && prev[key] === s[key] ? prev.place : i + 1;
+      let n = 0;
+      return sorted.map((s) => {
+        if (s.placing) return { ...s, bPlace: null };
+        n++;
+        const place = prev && prev[key] === s[key] ? prev.place : n;
         prev = { [key]: s[key], place };
         return { ...s, bPlace: place };
       });
     };
-    const base = state.ranking.map((s) => ({
+    const base = players.map((s) => ({
       name: s.name,
+      placing: s.games < MIN_GAMES,
       games: s.games,
       best: s.best,
       avoid: (s.games - s.ranks[3]) / s.games,
@@ -455,7 +461,12 @@
           <h3>${b.title}</h3>
           <div class="board-head"><span class="c">순위</span><span>선수</span><span>${b.col}</span></div>
           ${rows
-            .map((s) => `
+            .map((s) => s.placing ? `
+            <div class="board-row is-placing" data-player="${esc(s.name)}" title="배치 ${s.games}/${MIN_GAMES}">
+              <span class="n">배치</span>
+              <span>${esc(s.name)}</span>
+              <span class="v">${b.fmt(s[b.key])}</span>
+            </div>` : `
             <div class="board-row ${s.bPlace <= 3 ? "p" + s.bPlace : ""}" data-player="${esc(s.name)}">
               <span class="n">${s.bPlace === 1 ? "<span>1</span>" : s.bPlace}</span>
               <span>${esc(s.name)}</span>

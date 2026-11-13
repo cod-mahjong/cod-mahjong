@@ -226,6 +226,8 @@ button { font-family: inherit; }
 .board-row.p2 .n, .board-row.p3 .n { font-weight: 900; font-size: 20px; }
 .board-row.p2, .board-row.p3 { font-weight: 700; }
 .board-row:not(.p1):hover { background: var(--soft); }
+.board-row.is-placing { color: #b5b5b5; font-weight: 400; }
+.board-row.is-placing .n { font-family: inherit; font-size: 11px; font-weight: 700; color: #c0c0c0; }
 
 /* ---------- 대국 기록 ---------- */
 .round { margin-bottom: 48px; }
