@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>마작 대회</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='18' y='6' width='64' height='88' rx='10' fill='%23fff' stroke='%23128a4b' stroke-width='6'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='%23d0021b' font-family='sans-serif' font-weight='bold'>中</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Sans:wght@700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="frame" aria-hidden="true"></div>
+
+  <header class="header">
+    <div class="header-inner">
+      <a class="logo" href="#ranking" data-tab="ranking">
+        <span class="logo-mark" aria-hidden="true">
+          <svg viewBox="0 0 40 40"><path d="M6 8h12v24H6z" fill="#d0021b"/><path d="M14 4h12v24H14z" fill="#128a4b" opacity=".92"/><path d="M22 10h12v24H22z" fill="#1a1a1a"/></svg>
+        </span>
+        <span class="logo-text" id="site-title">마작 대회</span>
+      </a>
+      <nav class="gnav" role="tablist">
+        <button class="tab active" data-tab="ranking" role="tab">랭킹</button>
+        <button class="tab" data-tab="games" role="tab">대국 기록</button>
+        <button class="tab" data-tab="calc" role="tab">점수 계산기</button>
+        <button class="tab" data-tab="rules" role="tab">대회 규칙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- 랭킹 -->
+    <section id="tab-ranking" class="panel active">
+      <div class="hero">
+        <div class="hero-inner">
+          <div class="hero-head">
+            <h2 class="hero-title" id="site-subtitle"></h2>
+            <span class="hero-tag" id="updated">불러오는 중…</span>
+            <button id="refresh" class="refresh" title="새로고침" aria-label="새로고침">↻</button>
+          </div>
+          <div id="podium" class="podium"></div>
+        </div>
+      </div>
+
+      <div class="wrap">
+        <div id="notice" class="notice hidden"></div>
+
+        <section class="block">
+          <h2 class="c-title"><span lang="en">RANKING</span><span>종합 랭킹</span></h2>
+          <div class="search-row">
+            <input id="search" type="search" placeholder="선수 이름 검색" autocomplete="off" />
+          </div>
+          <div class="rank-list" id="rank-body"></div>
+          <div class="more-wrap"><button id="more" class="more hidden">전체 순위 보기 <span>⌄</span></button></div>
+          <div id="placing" class="placing"></div>
+        </section>
+
+        <section class="block">
+          <h2 class="c-title"><span lang="en">PERSONAL</span><span>개인 기록</span></h2>
+          <div class="boards" id="boards"></div>
+        </section>
+      </div>
+    </section>
+
+    <!-- 대국 기록 -->
+    <section id="tab-games" class="panel">
+      <div class="wrap">
+        <h2 class="c-title"><span lang="en">RESULTS</span><span>대국 기록</span></h2>
+        <div id="games-list"></div>
+      </div>
+    </section>
+
+    <!-- 계산기 -->
+    <section id="tab-calc" class="panel">
+      <div class="wrap">
+        <h2 class="c-title"><span lang="en">CALCULATOR</span><span>순위점 계산기</span></h2>
+        <div class="card calc">
+          <p class="muted">4명의 최종 점수를 입력하면 우마·오카를 반영한 pt를 계산합니다. 동점이면 기가(동→남→서→북) 순으로 상위입니다.</p>
+          <div class="calc-grid" id="calc-rows"></div>
+          <div class="calc-sum" id="calc-sum"></div>
+          <div class="save-box admin-only">
+            <div class="save-title">운영자 · 이 결과를 대국 기록으로 저장</div>
+            <div class="save-row">
+              <label>날짜 <input type="date" id="save-date" /></label>
+              <button id="save-game" class="btn">시트에 기록 저장</button>
+            </div>
+          </div>
+          <details class="calc-opts">
+            <summary>규칙 값 바꿔보기</summary>
+            <div class="opts-grid">
+              <label>원점 <input type="number" id="opt-start" step="1000" /></label>
+              <label>반환점 <input type="number" id="opt-return" step="1000" /></label>
+              <label>1위 우마 <input type="number" id="opt-u1" /></label>
+              <label>2위 우마 <input type="number" id="opt-u2" /></label>
+              <label>3위 우마 <input type="number" id="opt-u3" /></label>
+              <label>4위 우마 <input type="number" id="opt-u4" /></label>
+            </div>
+          </details>
+          <div class="calc-actions">
+            <button id="calc-reset" class="btn-outline">초기화</button>
+            <button id="calc-copy" class="btn">결과 복사</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 규칙 -->
+    <section id="tab-rules" class="panel">
+      <div class="wrap">
+        <h2 class="c-title"><span lang="en">RULES</span><span>대회 규칙</span></h2>
+        <div class="card rules" id="rules-body"></div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="player-modal">
+    <div class="modal-head">
+      <h3 id="pm-name"></h3>
+      <button class="modal-close" id="pm-close" aria-label="닫기">✕</button>
+    </div>
+    <div id="pm-body"></div>
+  </dialog>
+
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo" id="footer-title"></div>
+      <p>Riichi Mahjong Club Tournament</p>
+      <button id="admin-link" class="admin-link">운영자</button>
+    </div>
+  </footer>
+
+  <div class="admin-bar admin-only">
+    <span>운영자 모드</span>
+    <button id="admin-logout">끄기</button>
+  </div>
+
+  <dialog id="admin-modal" class="small-modal">
+    <div class="modal-head">
+      <h3>운영자 로그인</h3>
+      <button class="modal-close" aria-label="닫기">✕</button>
+    </div>
+    <form id="admin-form" class="admin-form">
+      <p class="muted">비밀번호를 입력하면 점수 계산기에서 기록을 저장하고, 대국 기록에서 삭제할 수 있어요.</p>
+      <input type="password" id="admin-pw" placeholder="운영자 비밀번호" autocomplete="current-password" required />
+      <p id="admin-error" class="admin-error"></p>
+      <button type="submit" id="admin-submit" class="btn">로그인</button>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
