@@ -27,7 +27,7 @@ window.CONFIG = {
 
   // 운영자 모드(사이트에서 기록 추가/삭제)용 Apps Script 웹 앱 주소.
   // apps-script/Code.gs 를 시트에 설치·배포한 뒤 나온 URL을 넣으세요. 비워두면 운영자 모드 꺼짐.
-  adminApiUrl: "https://script.google.com/macros/s/AKfycbyCka5mu5twLs_5uo1xBXFXKmFRR44ItxSAfXxLHEOwtk5yYhgxn-1AQrESYAqAz1jisQ/exec",
+  adminApiUrl: "https://script.google.com/macros/s/AKfycbzSj_ZLuJhQA9q6qnL-_J48HfQr9tuv7K7y6wUKfRZPK5noT9HwIj5Ifl6n9jsXL8-7rw/exec",
 
   // 점수 규칙 (리치마작)
   startPoints: 25000,        // 배급 원점
