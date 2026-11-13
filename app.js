@@ -339,23 +339,21 @@
   function renderRanking() {
     const q = state.search.trim().toLowerCase();
     const match = (s) => !q || s.name.toLowerCase().includes(q);
-    let list = state.ranking.filter(match);
+    // 배치 중인 선수도 점수 순서대로 함께 보여줌 (순위 번호 없이 연한 회색)
+    const full = [...state.ranking, ...state.placing].sort(cmpStanding);
+    let list = full.filter(match);
     const body = $("#rank-body");
     const more = $("#more");
     renderPlacing(state.placing.filter(match));
     if (!list.length) {
-      body.innerHTML = `<div class="empty">${
-        q ? (state.placing.some(match) ? "" : "검색 결과가 없어요.")
-          : state.placing.length ? `아직 배치 ${MIN_GAMES}판을 마친 선수가 없어요.`
-          : "아직 기록된 대국이 없어요."
-      }</div>`;
+      body.innerHTML = `<div class="empty">${q ? "검색 결과가 없어요." : "아직 기록된 대국이 없어요."}</div>`;
       more.classList.add("hidden");
       return;
     }
     const canFold = !q && list.length > TOP_N;
     more.classList.toggle("hidden", !canFold);
     more.classList.toggle("open", state.showAll);
-    more.firstChild.textContent = state.showAll ? "접기 " : `${TOP_N + 1}위 이하 보기 `;
+    more.firstChild.textContent = state.showAll ? "접기 " : `전체 ${list.length}명 보기 `;
     if (canFold && !state.showAll) list = list.slice(0, TOP_N);
 
     const head = `
@@ -365,6 +363,20 @@
       </div>`;
     body.innerHTML = head + list
       .map((s) => {
+        if (!s.place) {
+          const sub = s.games
+            ? `배치 ${s.games}/${MIN_GAMES} · 평균 ${s.avgRank.toFixed(2)}위`
+            : `배치 0/${MIN_GAMES} · 아직 대국 없음`;
+          return `
+        <div class="rank-row is-placing" data-player="${esc(s.name)}" title="배치 ${MIN_GAMES}판을 마치면 순위가 매겨져요">
+          <span class="badge badge-placing">배치</span>
+          <span class="rk-name">${esc(s.name)}<small>${sub}</small></span>
+          <span class="rk-pt">${fmtTotal(s.pt)}pt<small>(${fmtPt(s.pt)})</small></span>
+          <span class="rk-diff"></span>
+          <span class="rk-games hide-sm">${s.games}</span>
+        </div>`;
+        }
+        // '차'는 배치를 마친 선수끼리만 비교
         const idx = state.ranking.indexOf(s);
         const prev = idx > 0 ? state.ranking[idx - 1] : null;
         const diff = prev ? `${round1(prev.pt - s.pt).toFixed(1)}pt` : "—";
