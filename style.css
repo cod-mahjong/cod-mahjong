@@ -372,7 +372,26 @@ dialog::backdrop { background: rgba(0,0,0,.55); }
 .stat { border: 2px solid var(--line); border-radius: 10px; padding: 12px 8px; text-align: center; }
 .stat .v { font-weight: 900; font-size: 19px; }
 .stat .k { font-size: 12px; color: var(--muted); margin-top: 2px; }
-.trend { width: 100%; height: 90px; margin-bottom: 14px; }
+.pm-sec {
+  margin: 18px 0 8px; font-size: 15px; font-weight: 900;
+  padding-left: 10px; border-left: 4px solid var(--green);
+}
+.pm-sec small { font-size: 12px; font-weight: 500; color: var(--muted); margin-left: 6px; }
+.pm-chart { width: 100%; height: auto; display: block; }
+/* 게임 기록: 창 안에서 따로 스크롤 */
+.pm-scroll {
+  max-height: 260px; overflow-y: auto; border: 1px solid var(--line); border-radius: 10px;
+  -webkit-overflow-scrolling: touch;
+}
+.pm-scroll .pm-table thead th { position: sticky; top: 0; background: #fff; z-index: 1; }
+.rk-dot {
+  display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%;
+  color: #fff; font-weight: 900; font-size: 12px; background: var(--gray);
+}
+.rk-dot.r1 { background: var(--red); }
+.rk-dot.r2 { background: var(--green-dark); }
+.rk-dot.r3 { background: #6f9b7c; }
+.pm-scroll .pm-table td:first-child { white-space: nowrap; }
 .pm-table { width: 100%; border-collapse: collapse; }
 .pm-table th { font-size: 13px; color: var(--muted); font-weight: 700; padding: 8px 8px; border-bottom: 2px solid #000; white-space: nowrap; }
 .pm-table td { padding: 10px 8px; font-size: 14px; border-bottom: 1px solid var(--line); }
@@ -498,4 +517,6 @@ body.admin .admin-link { color: #fff; border-color: var(--green); background: va
   .calc-row input { padding: 9px 8px; font-size: 14px; }
   .rules { padding: 22px 18px; }
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .pm-table .hide-sm { display: none; }
+  .pm-scroll .pm-table td, .pm-scroll .pm-table th { padding: 9px 6px; font-size: 13px; }
 }

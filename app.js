@@ -565,23 +565,30 @@
         <div class="stat"><div class="v">${top2.toFixed(0)}%</div><div class="k">연대율 (1·2위)</div></div>
         <div class="stat"><div class="v">${fourth.toFixed(0)}%</div><div class="k">4위율</div></div>
       </div>
-      ${trendSVG(s.history)}
-      <table class="pm-table">
-        <thead><tr><th>날짜</th><th class="c">자리</th><th class="c">순위</th><th class="r">점수</th><th class="r">pt</th><th class="r">보유 점수</th></tr></thead>
-        <tbody>
-          ${s.history
-            .map((h) => `
-            <tr>
-              <td>${esc(h.short)} · ${h.no}게임</td>
-              <td class="c">${SEATS[h.seat]}</td>
-              <td class="c"><b>${h.rank}</b></td>
-              <td class="r">${fmtScore(h.score)}</td>
-              <td class="r ${ptClass(h.pt)}"><b>${fmtPt(h.pt)}</b></td>
-              <td class="r">${fmtTotal(h.cum)}</td>
-            </tr>`)
-            .join("")}
-        </tbody>
-      </table>`;
+      <h4 class="pm-sec">보유 점수 <small>최근 ${Math.min(RECENT_N, s.history.length)}국</small></h4>
+      ${pointSVG(s.history)}
+      <h4 class="pm-sec">최근 순위 <small>최근 ${Math.min(RECENT_N, s.history.length)}국</small></h4>
+      ${rankSVG(s.history)}
+      <h4 class="pm-sec">게임 기록 <small>총 ${s.games}국 · 최신순</small></h4>
+      <div class="pm-scroll">
+        <table class="pm-table">
+          <thead><tr><th>날짜</th><th class="c hide-sm">자리</th><th class="c">순위</th><th class="r">점수</th><th class="r">pt</th><th class="r hide-sm">보유 점수</th></tr></thead>
+          <tbody>
+            ${[...s.history]
+              .reverse()
+              .map((h) => `
+              <tr>
+                <td>${esc(h.short)} · ${h.no}게임</td>
+                <td class="c hide-sm">${SEATS[h.seat]}</td>
+                <td class="c"><span class="rk-dot r${h.rank}">${h.rank}</span></td>
+                <td class="r">${fmtScore(h.score)}</td>
+                <td class="r ${ptClass(h.pt)}"><b>${fmtPt(h.pt)}</b></td>
+                <td class="r hide-sm">${fmtTotal(h.cum)}</td>
+              </tr>`)
+              .join("")}
+          </tbody>
+        </table>
+      </div>`;
     showDialog("#player-modal");
   }
 
@@ -631,23 +638,72 @@
     dlg.scrollTop = 0;
   }
 
-  function trendSVG(history) {
-    if (history.length < 2) return "";
-    const W = 520, H = 90, P = 8;
-    const vals = [0, ...history.map((h) => h.cum)];
-    const max = Math.max(...vals, 0), min = Math.min(...vals, 0);
-    const span = max - min || 1;
-    const x = (i) => P + (i * (W - P * 2)) / (vals.length - 1);
-    const y = (v) => P + ((max - v) * (H - P * 2)) / span;
-    const pts = vals.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
-    const last = vals[vals.length - 1];
-    const color = last >= 0 ? "var(--plus)" : "var(--minus)";
-    return `
-      <svg class="trend" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="누적 pt 추이">
-        <line x1="${P}" x2="${W - P}" y1="${y(0)}" y2="${y(0)}" stroke="var(--line)" stroke-width="2" stroke-dasharray="4 4"/>
-        <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
-        ${vals.map((v, i) => `<circle cx="${x(i)}" cy="${y(v)}" r="3.5" fill="${color}"/>`).join("")}
-      </svg>`;
+  // ---------- 선수 창 그래프 (최근 RECENT_N국) ----------
+  const RECENT_N = 15;
+  // 휴대폰에선 폭을 좁게 그려서 글자가 작아지지 않게
+  const CH = { W: 560, L: 46, R: 16 };
+  const fitChart = () => { CH.W = window.innerWidth < 600 ? 360 : 560; };
+  // 점이 축 글자와 겹치지 않도록 양옆 14px 안쪽에서 시작
+  const chartX = (n, i) => {
+    const x0 = CH.L + 14, w = CH.W - CH.L - CH.R - 28;
+    return x0 + (n > 1 ? (i * w) / (n - 1) : w / 2);
+  };
+  const chartXLabels = (list, H) => list
+    .map((h, i) => (list.length <= 8 || i % 2 === (list.length - 1) % 2)
+      ? `<text x="${chartX(list.length, i)}" y="${H - 6}" text-anchor="middle" font-size="10.5" fill="#aaa">${esc(h.short)}</text>` : "")
+    .join("");
+
+  /** 보유 점수 그래프: 초록 선 + 시작 점수 기준선 */
+  function pointSVG(history) {
+    fitChart();
+    const list = history.slice(-RECENT_N);
+    const n = list.length;
+    const H = 170, T = 14, B = 26, ph = H - T - B;
+    const vals = list.map((h) => BASE + h.cum);
+    let lo = Math.min(BASE, ...vals), hi = Math.max(BASE, ...vals);
+    const pad = Math.max(10, (hi - lo) * 0.12);
+    lo -= pad; hi += pad;
+    const y = (v) => T + ((hi - v) * ph) / (hi - lo);
+    const x = (i) => chartX(n, i);
+    const G = "var(--green)";
+    const ticks = [hi - pad, (hi + lo) / 2, lo + pad].map((v) => Math.round(v));
+    const grid = ticks
+      .map((v) => `<line x1="${CH.L}" x2="${CH.W - CH.R}" y1="${y(v)}" y2="${y(v)}" stroke="#eee"/>
+        <text x="${CH.L - 8}" y="${y(v) + 4}" text-anchor="end" font-size="11" font-weight="700" fill="#999">${v}</text>`)
+      .join("");
+    const base = `<line x1="${CH.L}" x2="${CH.W - CH.R}" y1="${y(BASE)}" y2="${y(BASE)}" stroke="${G}" stroke-opacity=".4" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <text x="${CH.W - CH.R}" y="${y(BASE) - 5}" text-anchor="end" font-size="10.5" fill="${G}" fill-opacity=".7">시작 ${BASE}</text>`;
+    const pts = list.map((h, i) => `${x(i)},${y(BASE + h.cum)}`).join(" ");
+    const area = n > 1 ? `<polygon points="${x(0)},${T + ph} ${pts} ${x(n - 1)},${T + ph}" fill="${G}" fill-opacity=".08"/>` : "";
+    const line = n > 1 ? `<polyline points="${pts}" fill="none" stroke="${G}" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>` : "";
+    const dots = list
+      .map((h, i) => `<g><title>${esc(h.short)} ${h.no}게임 · ${fmtTotal(h.cum)}pt (${fmtPt(h.pt)})</title><circle cx="${x(i)}" cy="${y(BASE + h.cum)}" r="4.5" fill="#fff" stroke="${G}" stroke-width="3"/></g>`)
+      .join("");
+    return `<svg class="pm-chart" viewBox="0 0 ${CH.W} ${H}" role="img" aria-label="보유 점수 추이">${grid}${base}${area}${line}${dots}${chartXLabels(list, H)}</svg>`;
+  }
+
+  /** 최근 순위 그래프: 위가 1위, 아래가 4위. 점 색은 순위별, 안에 순위 숫자 */
+  function rankSVG(history) {
+    fitChart();
+    const list = history.slice(-RECENT_N);
+    const n = list.length;
+    const H = 150, T = 16, B = 26;
+    const y = (r) => T + ((r - 1) * (H - T - B)) / 3;
+    const x = (i) => chartX(n, i);
+    const color = ["var(--red)", "var(--green-dark)", "#6f9b7c", "var(--gray)"];
+    const grid = [1, 2, 3, 4]
+      .map((r) => `<line x1="${CH.L}" x2="${CH.W - CH.R}" y1="${y(r)}" y2="${y(r)}" stroke="#eee"/>
+        <text x="${CH.L - 8}" y="${y(r) + 4}" text-anchor="end" font-size="11" font-weight="700" fill="#999">${r}위</text>`)
+      .join("");
+    const line = n > 1
+      ? `<polyline points="${list.map((h, i) => `${x(i)},${y(h.rank)}`).join(" ")}" fill="none" stroke="#cfcfcf" stroke-width="2.5" stroke-linejoin="round"/>`
+      : "";
+    const dots = list
+      .map((h, i) => `<g><title>${esc(h.short)} ${h.no}게임 · ${h.rank}위 · ${fmtPt(h.pt)}</title>
+        <circle cx="${x(i)}" cy="${y(h.rank)}" r="10" fill="${color[h.rank - 1]}"/>
+        <text x="${x(i)}" y="${y(h.rank) + 4}" text-anchor="middle" font-size="11.5" font-weight="900" fill="#fff">${h.rank}</text></g>`)
+      .join("");
+    return `<svg class="pm-chart" viewBox="0 0 ${CH.W} ${H}" role="img" aria-label="최근 순위">${grid}${line}${dots}${chartXLabels(list, H)}</svg>`;
   }
 
   // ---------- 계산기 ----------
