@@ -773,10 +773,14 @@
 
   async function copyCalc() {
     if (!lastCalc) return;
-    const text = [...lastCalc]
-      .sort((a, b) => a.rank - b.rank)
-      .map((p) => `${p.rank}위 ${p.name} ${fmtScore(p.score)} (${fmtPt(p.pt)})`)
-      .join("\n");
+    // 날짜: 운영자 저장칸의 날짜(기본값 오늘)를 사용
+    const d = parseDate($("#save-date").value) || new Date();
+    const text = [
+      `[${dateLabel(d)}]`,
+      ...[...lastCalc]
+        .sort((a, b) => a.rank - b.rank)
+        .map((p) => `${p.rank}위 ${p.name} ${fmtScore(p.score)} (${fmtPt(p.pt)})`),
+    ].join("\n");
     const btn = $("#calc-copy");
     try {
       await navigator.clipboard.writeText(text);
