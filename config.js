@@ -23,7 +23,7 @@ window.CONFIG = {
 
   // 참가자 명단 — 같은 시트에 '선수' 탭을 만들고 A열에 이름을 적은 뒤, 그 탭을 CSV로 웹에 게시한 URL.
   // 비워두면 대국 기록에 나온 이름만 선수로 표시됩니다.
-  playersCsvUrl: "",
+  playersCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTg5w8bmi7Opdy-O7RoNfyNtWwIApgx58oPAJlUU3IKRtcq8MuB7WH8iKIdy-UCAAqcJOyDfxNXoytk/pub?gid=599301920&single=true&output=csv",
 
   // 운영자 모드(사이트에서 기록 추가/삭제)용 Apps Script 웹 앱 주소.
   // apps-script/Code.gs 를 시트에 설치·배포한 뒤 나온 URL을 넣으세요. 비워두면 운영자 모드 꺼짐.
