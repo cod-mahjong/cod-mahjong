@@ -14,11 +14,11 @@ const ADMIN_PASSWORD = '여기에-운영자-비밀번호'; // ← 꼭 바꾸세�
 const SHEET_NAME = ''; // 비워두면 첫 번째 시트를 사용
 
 function doPost(e) {
+  // 동시에 두 명이 수정하는 걸 막는 잠금. 잠금을 못 얻어도(구글 쪽 지연 등) 그냥 진행함
   const lock = LockService.getScriptLock();
   let locked = false;
   try {
-    lock.waitLock(10000);
-    locked = true;
+    try { locked = lock.tryLock(5000); } catch (e) { locked = false; }
     const req = JSON.parse((e && e.postData && e.postData.contents) || '{}');
     if (String(req.password || '') !== ADMIN_PASSWORD) {
       return out({ ok: false, error: '비밀번호가 틀렸어요.' });
@@ -37,7 +37,7 @@ function doPost(e) {
   } catch (err) {
     return out({ ok: false, error: String(err && err.message ? err.message : err) });
   } finally {
-    if (locked) lock.releaseLock();
+    if (locked) { try { lock.releaseLock(); } catch (e) {} }
   }
 }
 
