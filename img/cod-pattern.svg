@@ -1,40 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="440" height="320" viewBox="0 0 440 320">
-  <!--
-    시상대 배경용 반복 패턴: 정육면체(아이소메트릭 큐브) 모양으로 만든 C · O · D
-    모든 선은 큐브 모서리 방향(세로 / +30° / -30°)만 사용.
-    굵은 흰 띠 위에 회색 띠를 겹쳐서 테두리만 남는 입체 느낌.
-    큐브 크기: 반높이 h=58, 반폭 w=50 (w ≈ h·0.866)
-  -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="480" height="380" viewBox="0 0 480 380">
+  <!-- 시상대 배경 패턴: 정육면체 하나의 세 면에 C(왼쪽) · O(윗면) · D(오른쪽) — make_pattern.py로 생성 -->
   <defs>
-    <g id="letters" fill="none" stroke-linejoin="miter" stroke-miterlimit="4">
-      <!-- C : 오른쪽 면이 빠진 정육면체 -->
-      <g transform="translate(66 80)">
-        <path d="M50 -29 L0 -58 L-50 -29 L-50 29 L0 58 L50 29" />
-        <path d="M-50 -29 L0 0 L50 -29" />
-      </g>
-      <!-- O : 정육면체 하나 (육각 윤곽 + 안쪽 Y 모서리) -->
-      <g transform="translate(212 80)">
-        <path d="M0 -58 L50 -29 L50 29 L0 58 L-50 29 L-50 -29 Z" />
-        <path d="M-50 -29 L0 0 L50 -29 M0 0 L0 58" />
-      </g>
-      <!-- D : 세로 기둥 + 큐브 오른쪽 절반 -->
-      <g transform="translate(316 80)">
-        <path d="M0 -58 L50 -29 L50 29 L0 58 Z" />
-        <path d="M0 0 L50 -29" />
-      </g>
+    <g id="cubeLines" fill="none" stroke-linejoin="miter">
+      <polygon points="0.00,-74.00 64.09,-37.00 64.09,37.00 0.00,74.00 -64.09,37.00 -64.09,-37.00" />
+      <polyline points="-64.09,-37.00 0.00,0.00 64.09,-37.00" />
+      <line x1="0" y1="0" x2="0" y2="74" />
     </g>
-    <g id="cod">
-      <use xlink:href="#letters" href="#letters" stroke="#ffffff" stroke-width="26" />
-      <use xlink:href="#letters" href="#letters" stroke="#ececec" stroke-width="12" />
+    <g id="faceLetters" fill="none" stroke-linejoin="miter">
+      <path transform="matrix(0.6409 0.3700 0.0000 0.7400 -64.09 -37.00)" d="M80 22 H22 V78 H80" />
+      <path transform="matrix(0.6409 -0.3700 0.6409 0.3700 -64.09 -37.00)" d="M22 22 H78 V78 H22 Z" />
+      <path transform="matrix(0.6409 -0.3700 0.0000 0.7400 0.00 0.00)" d="M22 22 H58 L78 42 V58 L58 78 H22 Z" />
+    </g>
+    <g id="cube">
+      <use href="#cubeLines" xlink:href="#cubeLines" stroke="#ffffff" stroke-width="22" />
+      <use href="#cubeLines" xlink:href="#cubeLines" stroke="#ececec" stroke-width="10" />
+      <use href="#faceLetters" xlink:href="#faceLetters" stroke="#ffffff" stroke-width="24" />
+      <use href="#faceLetters" xlink:href="#faceLetters" stroke="#ececec" stroke-width="10" />
     </g>
   </defs>
-  <rect width="440" height="320" fill="#ececec" />
-  <!-- 한 줄씩 반 칸 엇갈리게 (가장자리에서 자연스럽게 이어지도록 복사본 포함) -->
-  <use xlink:href="#cod" href="#cod" x="0" y="0" />
-  <use xlink:href="#cod" href="#cod" x="-220" y="160" />
-  <use xlink:href="#cod" href="#cod" x="220" y="160" />
-  <use xlink:href="#cod" href="#cod" x="0" y="320" />
-  <use xlink:href="#cod" href="#cod" x="0" y="-320" />
-  <use xlink:href="#cod" href="#cod" x="-220" y="-160" />
-  <use xlink:href="#cod" href="#cod" x="220" y="-160" />
+  <rect width="480" height="380" fill="#ececec" />
+  <use href="#cube" xlink:href="#cube" x="120" y="95" />
+  <use href="#cube" xlink:href="#cube" x="360" y="95" />
+  <use href="#cube" xlink:href="#cube" x="0" y="285" />
+  <use href="#cube" xlink:href="#cube" x="240" y="285" />
+  <use href="#cube" xlink:href="#cube" x="480" y="285" />
+  <use href="#cube" xlink:href="#cube" x="0" y="-95" />
+  <use href="#cube" xlink:href="#cube" x="240" y="-95" />
+  <use href="#cube" xlink:href="#cube" x="480" y="-95" />
+  <use href="#cube" xlink:href="#cube" x="120" y="475" />
+  <use href="#cube" xlink:href="#cube" x="360" y="475" />
 </svg>

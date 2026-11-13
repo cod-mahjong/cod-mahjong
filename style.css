@@ -88,8 +88,8 @@ button { font-family: inherit; }
 .hero {
   background-color: #ececec;
   /* COD 글자 패턴 (img/cod-pattern.svg) */
-  background-image: url("img/cod-pattern.svg?v=2");
-  background-size: 420px 300px;
+  background-image: url("img/cod-pattern.svg?v=3");
+  background-size: 480px 380px;
   background-position: center top;
   padding: 40px 0 48px;
 }
@@ -454,7 +454,7 @@ body.admin .admin-link { color: #fff; border-color: var(--green); background: va
   .gnav { justify-content: space-between; }
   .tab { padding: 8px 6px; font-size: 14px; }
   .tab::after { left: 6px; right: 6px; }
-  .hero { padding: 26px 0 30px; background-size: 252px 180px; }
+  .hero { padding: 26px 0 30px; background-size: 288px 228px; }
   .hero-inner { padding: 0 16px; }
   .podium { grid-template-columns: 1fr 1.15fr 1fr; gap: 8px; }
   .pcard.slot1 { min-height: 200px; margin-bottom: 10px; }
