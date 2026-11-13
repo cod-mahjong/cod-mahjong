@@ -779,7 +779,7 @@
       `[${dateLabel(d)}]`,
       ...[...lastCalc]
         .sort((a, b) => a.rank - b.rank)
-        .map((p) => `${p.rank}위 ${p.name} ${fmtScore(p.score)} (${fmtPt(p.pt)})`),
+        .map((p) => `${p.rank}위 ${SEATS[p.seat]} ${p.name} ${fmtScore(p.score)} (${fmtPt(p.pt)})`),
     ].join("\n");
     const btn = $("#calc-copy");
     try {
