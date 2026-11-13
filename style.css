@@ -110,8 +110,8 @@ button { font-family: inherit; }
 .pcard.slot2 { order: 1; }
 .pcard.slot1 { order: 2; min-height: 330px; margin-bottom: 18px; box-shadow: 0 8px 26px rgba(0,0,0,.12); }
 .pcard.slot3 { order: 3; }
-.pcard.slot1 .pcard-rank { font-size: 112px; }
-.pcard.slot1 .pcard-name { font-size: 26px; }
+.pcard.slot1 .pcard-rank { font-size: 78px; }
+.pcard.slot1 .pcard-name { font-size: 36px; }
 .pcard.slot1 .pcard-x { width: 130px; height: 130px; }
 .pcard {
   background: #fff; border-radius: 20px; overflow: hidden; cursor: pointer;
@@ -122,11 +122,11 @@ button { font-family: inherit; }
 .pcard:hover { transform: translateY(-4px); }
 .pcard-body { flex: 1; display: grid; place-items: center; padding: 24px 16px 8px; }
 .pcard-rank {
-  font-family: "Noto Sans", sans-serif; font-weight: 900; font-size: 92px; line-height: 1;
+  font-family: "Noto Sans", sans-serif; font-weight: 900; font-size: 62px; line-height: 1;
   color: var(--green-dark);
 }
 .pcard.r1 .pcard-rank { color: var(--red); }
-.pcard-rank small { font-size: 28px; margin-left: 2px; }
+.pcard-rank small { font-size: 22px; margin-left: 2px; }
 .pcard-foot {
   background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #4c8d63 45%, #1d5a32 100%);
   color: #fff; text-align: center; padding: 34px 12px 16px;
@@ -135,8 +135,8 @@ button { font-family: inherit; }
 .pcard.is-empty:hover { transform: none; }
 .pcard-x { width: 110px; height: 110px; color: var(--red); }
 .pcard.is-empty .pcard-foot { background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #b9b9b9 45%, #8a8a8a 100%); }
-.pcard-name { font-size: 22px; font-weight: 900; word-break: keep-all; }
-.pcard-pt { font-size: 15px; font-weight: 700; margin-top: 2px; opacity: .95; }
+.pcard-name { font-size: 30px; font-weight: 900; word-break: keep-all; line-height: 1.2; text-shadow: 0 1px 3px rgba(0,0,0,.25); }
+.pcard-pt { font-size: 16px; font-weight: 700; margin-top: 4px; opacity: .95; }
 
 /* ---------- Notice / Search ---------- */
 .notice {
@@ -456,16 +456,16 @@ body.admin .admin-link { color: #fff; border-color: var(--green); background: va
   .hero-inner { padding: 0 16px; }
   .podium { grid-template-columns: 1fr 1.15fr 1fr; gap: 8px; }
   .pcard.slot1 { min-height: 200px; margin-bottom: 10px; }
-  .pcard.slot1 .pcard-rank { font-size: 62px; }
-  .pcard.slot1 .pcard-name { font-size: 17px; }
+  .pcard.slot1 .pcard-rank { font-size: 44px; }
+  .pcard.slot1 .pcard-name { font-size: 22px; }
   .pcard.slot1 .pcard-x { width: 70px; height: 70px; }
   .pcard { min-height: 170px; border-radius: 14px; }
   .pcard-body { padding: 14px 4px 0; }
-  .pcard-rank { font-size: 52px; }
+  .pcard-rank { font-size: 36px; }
   .pcard-x { width: 60px; height: 60px; }
-  .pcard-rank small { font-size: 18px; }
+  .pcard-rank small { font-size: 14px; }
   .pcard-foot { padding: 20px 4px 10px; }
-  .pcard-name { font-size: 15px; }
+  .pcard-name { font-size: 19px; }
   .pcard-pt { font-size: 12px; }
   .wrap { padding: 40px 16px 60px; }
   .block + .block { margin-top: 64px; }
