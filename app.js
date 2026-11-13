@@ -2,6 +2,8 @@
   "use strict";
 
   const C = window.CONFIG || {};
+  /** 프로필 사진 자리 (지금은 빈 칸 — 회색 원에 사람 실루엣) */
+  const AVATAR = `<span class="avatar" aria-hidden="true"></span>`;
   const SEATS = ["東", "南", "西", "北"];
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -381,7 +383,7 @@
           return `
         <div class="rank-row is-placing" data-player="${esc(s.name)}" title="배치 ${MIN_GAMES}판을 마치면 순위가 매겨져요">
           <span class="badge badge-placing">배치</span>
-          <span class="rk-name">${esc(s.name)}<small>${sub}</small></span>
+          <span class="rk-name">${AVATAR}<span class="rk-text">${esc(s.name)}<small>${sub}</small></span></span>
           <span class="rk-pt">${fmtTotal(s.pt)}pt<small>(${fmtPt(s.pt)})</small></span>
           <span class="rk-diff"></span>
           <span class="rk-games hide-sm">${s.games}</span>
@@ -395,7 +397,7 @@
         return `
         <div class="rank-row" data-player="${esc(s.name)}">
           <span class="badge ${badge}">${s.place}</span>
-          <span class="rk-name">${esc(s.name)}<small>평균 ${s.avgRank.toFixed(2)}위 · ${s.ranks.join("-")}</small></span>
+          <span class="rk-name">${AVATAR}<span class="rk-text">${esc(s.name)}<small>평균 ${s.avgRank.toFixed(2)}위 · ${s.ranks.join("-")}</small></span></span>
           <span class="rk-pt">${fmtTotal(s.pt)}pt<small>(${fmtPt(s.pt)})</small></span>
           <span class="rk-diff">${diff}</span>
           <span class="rk-games hide-sm">${s.games}</span>
@@ -475,12 +477,12 @@
             .map((s) => s.placing ? `
             <div class="board-row is-placing" data-player="${esc(s.name)}" title="배치 ${s.games}/${MIN_GAMES}">
               <span class="n">배치</span>
-              <span>${esc(s.name)}</span>
+              <span class="b-name">${AVATAR}<span>${esc(s.name)}</span></span>
               <span class="v">${b.fmt(s[b.key])}</span>
             </div>` : `
             <div class="board-row ${s.bPlace <= 3 ? "p" + s.bPlace : ""}" data-player="${esc(s.name)}">
               <span class="n">${s.bPlace === 1 ? "<span>1</span>" : s.bPlace}</span>
-              <span>${esc(s.name)}</span>
+              <span class="b-name">${AVATAR}<span>${esc(s.name)}</span></span>
               <span class="v">${b.fmt(s[b.key])}</span>
             </div>`)
             .join("")}
