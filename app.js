@@ -565,9 +565,9 @@
         <div class="stat"><div class="v">${top2.toFixed(0)}%</div><div class="k">연대율 (1·2위)</div></div>
         <div class="stat"><div class="v">${fourth.toFixed(0)}%</div><div class="k">4위율</div></div>
       </div>
-      <h4 class="pm-sec">보유 점수 <small>최근 ${Math.min(RECENT_N, s.history.length)}국</small></h4>
+      <h4 class="pm-sec">보유 점수 <small>최근 ${RECENT_N}국</small></h4>
       ${pointSVG(s.history)}
-      <h4 class="pm-sec">최근 순위 <small>최근 ${Math.min(RECENT_N, s.history.length)}국</small></h4>
+      <h4 class="pm-sec">최근 순위 <small>최근 ${RECENT_N}국</small></h4>
       ${rankSVG(s.history)}
       <h4 class="pm-sec">게임 기록 <small>총 ${s.games}국 · 최신순</small></h4>
       <div class="pm-scroll">
@@ -643,14 +643,18 @@
   // 휴대폰에선 폭을 좁게 그려서 글자가 작아지지 않게
   const CH = { W: 560, L: 46, R: 16 };
   const fitChart = () => { CH.W = window.innerWidth < 600 ? 360 : 560; };
-  // 점이 축 글자와 겹치지 않도록 양옆 14px 안쪽에서 시작
-  const chartX = (n, i) => {
+  // 가로축은 항상 RECENT_N칸 고정. 판수가 적으면 왼쪽부터 친 만큼만 채움
+  // (점이 축 글자와 겹치지 않도록 양옆 14px 안쪽에서 시작)
+  const chartX = (i) => {
     const x0 = CH.L + 14, w = CH.W - CH.L - CH.R - 28;
-    return x0 + (n > 1 ? (i * w) / (n - 1) : w / 2);
+    return x0 + (i * w) / (RECENT_N - 1);
   };
+  // RECENT_N칸 자리 표시 (빈 칸도 보이도록 옅은 세로선)
+  const chartSlots = (top, bottom) => Array.from({ length: RECENT_N }, (_, i) =>
+    `<line x1="${chartX(i)}" x2="${chartX(i)}" y1="${top}" y2="${bottom}" stroke="#f2f2f2" stroke-width="1"/>`).join("");
   const chartXLabels = (list, H) => list
-    .map((h, i) => (list.length <= 8 || i % 2 === (list.length - 1) % 2)
-      ? `<text x="${chartX(list.length, i)}" y="${H - 6}" text-anchor="middle" font-size="10.5" fill="#aaa">${esc(h.short)}</text>` : "")
+    .map((h, i) => (window.innerWidth >= 600 || i % 2 === 0)
+      ? `<text x="${chartX(i)}" y="${H - 6}" text-anchor="middle" font-size="10.5" fill="#aaa">${esc(h.short)}</text>` : "")
     .join("");
 
   /** 보유 점수 그래프: 초록 선 + 시작 점수 기준선 */
@@ -664,7 +668,7 @@
     const pad = Math.max(10, (hi - lo) * 0.12);
     lo -= pad; hi += pad;
     const y = (v) => T + ((hi - v) * ph) / (hi - lo);
-    const x = (i) => chartX(n, i);
+    const x = chartX;
     const G = "var(--green)";
     const ticks = [hi - pad, (hi + lo) / 2, lo + pad].map((v) => Math.round(v));
     const grid = ticks
@@ -679,7 +683,7 @@
     const dots = list
       .map((h, i) => `<g><title>${esc(h.short)} ${h.no}게임 · ${fmtTotal(h.cum)}pt (${fmtPt(h.pt)})</title><circle cx="${x(i)}" cy="${y(BASE + h.cum)}" r="4.5" fill="#fff" stroke="${G}" stroke-width="3"/></g>`)
       .join("");
-    return `<svg class="pm-chart" viewBox="0 0 ${CH.W} ${H}" role="img" aria-label="보유 점수 추이">${grid}${base}${area}${line}${dots}${chartXLabels(list, H)}</svg>`;
+    return `<svg class="pm-chart" viewBox="0 0 ${CH.W} ${H}" role="img" aria-label="보유 점수 추이">${chartSlots(T, T + ph)}${grid}${base}${area}${line}${dots}${chartXLabels(list, H)}</svg>`;
   }
 
   /** 최근 순위 그래프: 위가 1위, 아래가 4위. 점 색은 순위별, 안에 순위 숫자 */
@@ -689,7 +693,7 @@
     const n = list.length;
     const H = 150, T = 16, B = 26;
     const y = (r) => T + ((r - 1) * (H - T - B)) / 3;
-    const x = (i) => chartX(n, i);
+    const x = chartX;
     const color = ["var(--red)", "var(--green-dark)", "#6f9b7c", "var(--gray)"];
     const grid = [1, 2, 3, 4]
       .map((r) => `<line x1="${CH.L}" x2="${CH.W - CH.R}" y1="${y(r)}" y2="${y(r)}" stroke="#eee"/>
@@ -703,7 +707,7 @@
         <circle cx="${x(i)}" cy="${y(h.rank)}" r="10" fill="${color[h.rank - 1]}"/>
         <text x="${x(i)}" y="${y(h.rank) + 4}" text-anchor="middle" font-size="11.5" font-weight="900" fill="#fff">${h.rank}</text></g>`)
       .join("");
-    return `<svg class="pm-chart" viewBox="0 0 ${CH.W} ${H}" role="img" aria-label="최근 순위">${grid}${line}${dots}${chartXLabels(list, H)}</svg>`;
+    return `<svg class="pm-chart" viewBox="0 0 ${CH.W} ${H}" role="img" aria-label="최근 순위">${chartSlots(T - 6, H - B + 6)}${grid}${line}${dots}${chartXLabels(list, H)}</svg>`;
   }
 
   // ---------- 계산기 ----------
