@@ -7,8 +7,8 @@ window.CONFIG = {
   subtitle: "2026 리치마작 리그",
 
   // 대회 기간 (YYYY-MM-DD). 상단에 D-day, 규칙 탭에 기간이 표시됩니다.
-  startDate: "2026-11-10",
-  endDate: "2026-11-30",
+  startDate: "2026-11-16",
+  endDate: "2026-12-04",
 
   // 구글 시트 → 파일 → 공유 → 웹에 게시 → (시트 선택) → CSV 로 게시한 URL
   // 비워두면 data/sample.csv(예시 데이터)를 보여줍니다.
@@ -20,6 +20,10 @@ window.CONFIG = {
 
   // 배치 판수 — 이 판수 이상 친 선수부터 랭킹·시상 대상 (미만은 '배치 중'으로 표시)
   placementGames: 5,
+
+  // 참가자 명단 — 같은 시트에 '선수' 탭을 만들고 A열에 이름을 적은 뒤, 그 탭을 CSV로 웹에 게시한 URL.
+  // 비워두면 대국 기록에 나온 이름만 선수로 표시됩니다.
+  playersCsvUrl: "",
 
   // 운영자 모드(사이트에서 기록 추가/삭제)용 Apps Script 웹 앱 주소.
   // apps-script/Code.gs 를 시트에 설치·배포한 뒤 나온 URL을 넣으세요. 비워두면 운영자 모드 꺼짐.

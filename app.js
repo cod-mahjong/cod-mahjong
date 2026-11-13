@@ -7,7 +7,7 @@
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 
   const state = {
-    entries: [], games: [], ranking: [], placing: [], all: [],
+    entries: [], games: [], ranking: [], placing: [], all: [], roster: [],
     search: "", loadedAt: null, showAll: false,
     admin: false, extraNames: [],
   };
@@ -233,7 +233,13 @@
         s.history.push({ gi, short: g.short, no: g.no, seat: p.seat, rank: p.rank, score: p.score, pt: p.pt, cum: s.pt });
       });
     });
-    const all = [...map.values()].map((s) => ({ ...s, avgRank: s.rankSum / s.games }));
+    // 참가자 명단에만 있고 아직 대국이 없는 선수도 '배치 중 0/5'로 포함
+    state.roster.forEach((name) => {
+      if (!map.has(name)) {
+        map.set(name, { name, pt: 0, games: 0, ranks: [0, 0, 0, 0], best: -Infinity, rankSum: 0, history: [] });
+      }
+    });
+    const all = [...map.values()].map((s) => ({ ...s, avgRank: s.games ? s.rankSum / s.games : 0 }));
     // 배치 판수를 채운 선수만 순위를 매김
     const ranked = all.filter((s) => s.games >= MIN_GAMES);
     ranked.sort(cmpStanding);
@@ -244,18 +250,35 @@
     return { ranked, placing, all };
   }
 
+  /** 참가자 명단 CSV: A열 이름 (첫 줄 '이름' 헤더는 건너뜀) */
+  function parseRoster(text) {
+    const names = parseCSV(text)
+      .map((r) => (r[0] || "").trim())
+      .filter((n, i) => n && !(i === 0 && /^(이름|선수|name)/i.test(n)));
+    return [...new Set(names)];
+  }
+
   // ---------- 데이터 로드 ----------
   async function load() {
     const updated = $("#updated");
     const notice = $("#notice");
     updated.textContent = "불러오는 중…";
     const usingSample = !C.gamesCsvUrl;
-    const url = usingSample ? "data/sample.csv" : C.gamesCsvUrl + (C.gamesCsvUrl.includes("?") ? "&" : "?") + "_=" + Date.now();
-    try {
-      const res = await fetch(url, { cache: "no-store" });
+    const bust = (u) => u + (u.includes("?") ? "&" : "?") + "_=" + Date.now();
+    const getCSV = async (u) => {
+      const res = await fetch(u, { cache: "no-store" });
       if (!res.ok) throw new Error("HTTP " + res.status);
       const text = await res.text();
       if (/^\s*<(!doctype|html)/i.test(text)) throw new Error("CSV가 아닌 웹페이지가 왔어요. 시트를 'CSV'로 웹에 게시했는지 확인하세요.");
+      return text;
+    };
+    try {
+      const [text, rosterText] = await Promise.all([
+        getCSV(usingSample ? "data/sample.csv" : bust(C.gamesCsvUrl)),
+        // 참가자 명단은 없어도 동작 — 실패하면 빈 명단
+        C.playersCsvUrl ? getCSV(bust(C.playersCsvUrl)).catch(() => null) : null,
+      ]);
+      if (rosterText !== null) state.roster = parseRoster(rosterText);
       const { entries, problems } = rowsToEntries(parseCSV(text));
       state.entries = entries;
       rebuild();
@@ -493,6 +516,10 @@
     $("#pm-name").textContent = s.place
       ? `${s.place}위 · ${s.name}`
       : `배치 중 ${s.games}/${MIN_GAMES} · ${s.name}`;
+    if (!s.games) {
+      $("#pm-body").innerHTML = `<div class="empty">아직 대국 기록이 없어요.<br>${MIN_GAMES}판을 치면 랭킹에 올라가요.</div>`;
+      return showDialog("#player-modal");
+    }
     const top2 = ((s.ranks[0] + s.ranks[1]) / s.games) * 100;
     const fourth = (s.ranks[3] / s.games) * 100;
     $("#pm-body").innerHTML = `
