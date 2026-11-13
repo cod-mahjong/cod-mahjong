@@ -323,9 +323,19 @@
   function renderPodium() {
     const top = state.ranking.slice(0, 3);
     const el = $("#podium");
-    if (!top.length) { el.innerHTML = ""; return; }
-    el.innerHTML = top
-      .map((s) => `
+    // 배치를 마친 선수가 3명이 안 되면 빈 자리는 빨간 X 카드로 표시
+    const X = `<svg class="pcard-x" viewBox="0 0 100 100" aria-hidden="true"><path d="M20 20 L80 80 M80 20 L20 80" stroke="currentColor" stroke-width="14" stroke-linecap="round"/></svg>`;
+    const empty = (n) => `
+        <div class="pcard r${n} is-empty" title="배치 ${MIN_GAMES}판을 마친 선수가 아직 없어요">
+          <div class="pcard-body">${X}</div>
+          <div class="pcard-foot">
+            <div class="pcard-name">${n}위</div>
+            <div class="pcard-pt">배치 완료자 없음</div>
+          </div>
+        </div>`;
+    el.innerHTML = [0, 1, 2]
+      .map((i) => top[i] || i + 1)
+      .map((s) => typeof s === "number" ? empty(s) : `
         <div class="pcard r${s.place}" data-player="${esc(s.name)}">
           <div class="pcard-body"><div class="pcard-rank">${s.place}<small>위</small></div></div>
           <div class="pcard-foot">
