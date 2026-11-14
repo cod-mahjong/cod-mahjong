@@ -343,17 +343,6 @@ button { font-family: inherit; }
 .btn-outline { background: #fff; color: var(--green); }
 .btn-outline:hover { background: var(--soft); }
 
-/* ---------- 규칙 ---------- */
-.rules { padding: 28px 32px; line-height: 1.8; max-width: 760px; margin: 0 auto; }
-.rules h3 {
-  margin: 28px 0 10px; font-size: 18px; font-weight: 900;
-  padding-left: 12px; border-left: 5px solid var(--green);
-}
-.rules h3:first-child { margin-top: 0; }
-.rules table { width: 100%; border-collapse: collapse; }
-.rules th, .rules td { padding: 10px 14px; font-size: 15px; text-align: left; border-bottom: 1px solid var(--line); }
-.rules th { width: 120px; background: var(--soft); font-weight: 700; }
-
 /* ---------- 선수 모달 ---------- */
 dialog {
   border: 0; border-radius: 20px; padding: 0;
@@ -509,6 +498,26 @@ body.admin .admin-hide { display: none !important; }
 }
 .field input:focus, .field select:focus { outline: none; border-color: var(--green); }
 
+/* ---------- 대회 규칙 (장·조 형식) ---------- */
+.rule-doc { max-width: 740px; margin: 0 auto; }
+.rule-chapter { text-align: center; font-size: 19px; font-weight: 900; margin: 56px 0 34px; }
+.rule-chapter:first-child { margin-top: 8px; }
+.rule-article + .rule-article { margin-top: 40px; }
+.rule-head {
+  position: relative; margin: 0; padding: 10px 22px; border-radius: 999px;
+  background: #ededed; font-size: 17px; font-weight: 900;
+}
+.rule-head i {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: 13px; height: 13px; border-radius: 50%; background: var(--red);
+}
+.rule-text, .rule-list {
+  margin: 22px 0 0; padding: 0 40px; font-size: 15px; font-weight: 700; line-height: 1.85;
+}
+.rule-list { padding-left: 58px; }
+.rule-list li + li { margin-top: 10px; }
+.rule-list li::marker { font-weight: 900; }
+
 /* ---------- Footer ---------- */
 .footer { background: #000; color: #fff; }
 .footer-inner { max-width: 1200px; margin: 0 auto; padding: 48px 24px 56px; text-align: center; }
@@ -553,6 +562,12 @@ body.admin .admin-hide { display: none !important; }
   .calc-row input { padding: 9px 8px; font-size: 14px; }
   .rules { padding: 22px 18px; }
   .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .rule-chapter { font-size: 17px; margin: 44px 0 24px; }
+  .rule-article + .rule-article { margin-top: 30px; }
+  .rule-head { font-size: 15px; padding: 9px 18px; }
+  .rule-head i { left: auto; right: 18px; transform: translateY(-50%); width: 11px; height: 11px; }
+  .rule-text, .rule-list { padding: 0 8px; font-size: 14px; margin-top: 16px; }
+  .rule-list { padding-left: 28px; }
   .players-hero { min-height: 170px; }
   .players-hero-logo { height: 96px; }
   .add-player-btn { font-size: 18px; padding: 14px 30px; }

@@ -939,37 +939,61 @@
     const period = s && e
       ? `${s.getFullYear()}년 ${dateLabel(s)} ~ ${dateLabel(e)}`
       : "운영진 공지 참고";
-    $("#rules-body").innerHTML = `
-      <h3>대회 방식</h3>
-      <table>
-        <tbody>
-          <tr><th>기간</th><td>${period}</td></tr>
-          <tr><th>대국 수</th><td>제한 없음 — 기간 동안 자유롭게 대국</td></tr>
-          ${MIN_GAMES ? `<tr><th>배치</th><td>${MIN_GAMES}판 이상 친 선수부터 랭킹·시상 대상</td></tr>` : ""}
-          <tr><th>시작 점수</th><td>모두 ${BASE}점으로 시작 — 매 판의 pt만큼 더해지고 빠짐</td></tr>
-          <tr><th>시상</th><td>마지막 날 종합 랭킹 점수 순으로 시상</td></tr>
-        </tbody>
-      </table>
-      <h3>점수 설정</h3>
-      <table>
-        <tbody>
-          <tr><th>배급 원점</th><td>${fmtScore(r.start)}점</td></tr>
-          <tr><th>반환점</th><td>${fmtScore(r.ret)}점</td></tr>
-          <tr><th>오카</th><td>+${oka}pt (1위에게)</td></tr>
-          <tr><th>우마</th><td>${r.uma.map((u, i) => `${i + 1}위 ${u > 0 ? "+" : ""}${u}`).join(" / ")}</td></tr>
-        </tbody>
-      </table>
-      <h3>pt 계산 방법</h3>
-      <p class="muted">
-        pt = (최종 점수 − ${fmtScore(r.ret)}) ÷ 1000 + 우마 (+ 1위는 오카 ${oka})<br>
-        예) 1위 42,300점 → (42,300 − ${fmtScore(r.ret)}) ÷ 1000 + ${r.uma[0]} + ${oka} = <b>${fmtPt(round1((42300 - r.ret) / 1000 + r.uma[0] + oka))}</b>
-      </p>
-      <h3>순위 결정</h3>
-      <p class="muted">
-        대국 내 동점: 기가(起家) 기준 동 → 남 → 서 → 북 순으로 상위.<br>
-        종합 랭킹 동률: 총 pt → 평균 순위 → 1위 횟수 → 최고 점수 순으로 비교.
-      </p>
-    `;
+    const ex = round1((42300 - r.ret) / 1000 + r.uma[0] + oka);
+
+    // 장(章) → 조(條) 구조. body는 문단 하나 또는 번호 목록(배열)
+    const chapters = [
+      {
+        title: "대회 방식",
+        articles: [
+          { title: "기간", body: `대회는 ${period}까지 진행한다.` },
+          { title: "대국", body: [
+            "대국 수에는 제한이 없으며, 기간 동안 자유롭게 대국할 수 있다.",
+            "대국 결과는 운영진이 기록하며, 기록된 결과는 사이트의 랭킹에 반영된다.",
+          ] },
+          ...(MIN_GAMES ? [{ title: "배치", body: `${MIN_GAMES}판 이상 대국한 선수부터 종합 랭킹 및 시상 대상이 된다. ${MIN_GAMES}판 미만인 선수는 '배치 중'으로 표시한다.` }] : []),
+          { title: "시상", body: "대회 마지막 날의 종합 랭킹 점수 순으로 시상한다." },
+        ],
+      },
+      {
+        title: "점수",
+        articles: [
+          { title: "점수 설정", body: [
+            `배급 원점은 ${fmtScore(r.start)}점으로 한다.`,
+            `반환점은 ${fmtScore(r.ret)}점으로 한다.`,
+            `오카는 +${oka}pt로 하며, 1위가 가져간다.`,
+            `우마는 ${r.uma.map((u, i) => `${i + 1}위 ${u > 0 ? "+" : ""}${u}`).join(" · ")}으로 한다.`,
+          ] },
+          { title: "pt 계산", body: [
+            `pt = (최종 점수 − ${fmtScore(r.ret)}) ÷ 1000 + 우마 (1위는 오카 +${oka} 추가)`,
+            `예) 1위 42,300점 → (42,300 − ${fmtScore(r.ret)}) ÷ 1000 + ${r.uma[0]} + ${oka} = ${fmtPt(ex)}`,
+          ] },
+          { title: "랭킹 점수", body: `모든 선수는 ${BASE}점으로 시작하며, 매 대국의 pt만큼 더하고 뺀 값을 랭킹 점수로 한다.` },
+        ],
+      },
+      {
+        title: "순위 결정",
+        articles: [
+          { title: "대국 내 동점", body: "한 대국에서 최종 점수가 같은 경우, 기가(起家) 기준 동 → 남 → 서 → 북 순으로 상위로 한다." },
+          { title: "종합 랭킹 동률", body: "랭킹 점수가 같은 경우, 평균 순위 → 1위 횟수 → 최고 점수 순으로 비교한다." },
+        ],
+      },
+    ];
+
+    let n = 0;
+    $("#rules-body").innerHTML = chapters
+      .map((ch, ci) => `
+        <h3 class="rule-chapter">제${ci + 1}장 ${ch.title}</h3>
+        ${ch.articles
+          .map((a) => `
+          <section class="rule-article">
+            <h4 class="rule-head"><span>제${++n}조 ${a.title}</span><i aria-hidden="true"></i></h4>
+            ${Array.isArray(a.body)
+              ? `<ol class="rule-list">${a.body.map((t) => `<li>${t}</li>`).join("")}</ol>`
+              : `<p class="rule-text">${a.body}</p>`}
+          </section>`)
+          .join("")}`)
+      .join("");
   }
 
   // ---------- 이벤트 ----------
