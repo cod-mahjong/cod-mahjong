@@ -558,12 +558,13 @@
     const top2 = ((s.ranks[0] + s.ranks[1]) / s.games) * 100;
     const fourth = (s.ranks[3] / s.games) * 100;
     const topRate = (s.ranks[0] / s.games) * 100;
-    const bestPt = Math.max(...s.history.map((h) => h.pt)); // 한 판에서 얻은 가장 높은 pt
+    // 최고 점수: 대회 중 보유 점수가 가장 높이 올라갔던 때의 값과 그 시점
+    const peak = s.history.reduce((m, h) => (h.cum > m.cum ? h : m), s.history[0]);
     $("#pm-body").innerHTML = `
       <div class="stat-grid">
         <div class="stat"><div class="v">${fmtTotal(s.pt)}</div><div class="k">현재 점수 (${fmtPt(s.pt)})</div></div>
         <div class="stat"><div class="v">${s.avgRank.toFixed(2)}</div><div class="k">평균 순위</div></div>
-        <div class="stat"><div class="v">${fmtPt(bestPt)}</div><div class="k">최고 포인트</div></div>
+        <div class="stat"><div class="v">${fmtTotal(peak.cum)}</div><div class="k">최고 점수 (${esc(peak.short)} ${peak.no}게임)</div></div>
         <div class="stat"><div class="v">${topRate.toFixed(0)}%</div><div class="k">탑률 (1위)</div></div>
         <div class="stat"><div class="v">${top2.toFixed(0)}%</div><div class="k">연대율 (1·2위)</div></div>
         <div class="stat"><div class="v">${fourth.toFixed(0)}%</div><div class="k">4위율</div></div>
