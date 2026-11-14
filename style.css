@@ -509,7 +509,7 @@ body.admin .admin-hide { display: none !important; }
 }
 .rule-head i {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  width: 13px; height: 13px; border-radius: 50%; background: var(--red);
+  width: 13px; height: 13px; border-radius: 50%; background: #a8001a; /* 천점봉의 빨간 점 */
 }
 .rule-text, .rule-list {
   margin: 22px 0 0; padding: 0 40px; font-size: 15px; font-weight: 700; line-height: 1.85;
@@ -564,8 +564,9 @@ body.admin .admin-hide { display: none !important; }
   .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
   .rule-chapter { font-size: 17px; margin: 44px 0 24px; }
   .rule-article + .rule-article { margin-top: 30px; }
-  .rule-head { font-size: 15px; padding: 9px 18px; }
-  .rule-head i { left: auto; right: 18px; transform: translateY(-50%); width: 11px; height: 11px; }
+  .rule-head { font-size: 13px; padding: 9px 14px; }
+  .rule-head span { display: inline-block; max-width: calc(50% - 14px); }
+  .rule-head i { width: 11px; height: 11px; }
   .rule-text, .rule-list { padding: 0 8px; font-size: 14px; margin-top: 16px; }
   .rule-list { padding-left: 28px; }
   .players-hero { min-height: 170px; }
