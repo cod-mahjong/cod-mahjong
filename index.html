@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Sans:wght@700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=20261115014846" />
+  <link rel="stylesheet" href="style.css?v=20261115020323" />
 </head>
 <body>
   <div class="frame" aria-hidden="true"></div>
@@ -36,6 +36,7 @@
       </a>
       <nav class="gnav" role="tablist">
         <button class="tab active" data-tab="ranking" role="tab">랭킹</button>
+        <button class="tab" data-tab="players" role="tab">선수</button>
         <button class="tab" data-tab="games" role="tab">대국 기록</button>
         <button class="tab" data-tab="calc" role="tab">점수 계산기</button>
         <button class="tab" data-tab="rules" role="tab">대회 규칙</button>
@@ -74,6 +75,20 @@
           <h2 class="c-title"><span lang="en">PERSONAL</span><span>개인 기록</span></h2>
           <div class="boards" id="boards"></div>
         </section>
+      </div>
+    </section>
+
+    <!-- 선수 -->
+    <section id="tab-players" class="panel">
+      <div class="players-hero">
+        <!-- 평소엔 COD 마크, 운영자 모드에선 선수 추가 버튼 -->
+        <img class="players-hero-logo admin-hide" src="img/cod-logo.png" alt="COD" />
+        <button id="add-player" class="add-player-btn admin-only">＋ 선수 추가</button>
+      </div>
+      <div class="wrap">
+        <h2 class="c-title"><span lang="en">PLAYERS</span><span>참가 선수</span></h2>
+        <p class="players-count" id="players-count"></p>
+        <div id="players-list" class="players-list"></div>
       </div>
     </section>
 
@@ -164,6 +179,31 @@
     </form>
   </dialog>
 
+  <!-- 선수 추가 (운영자) -->
+  <dialog id="player-add-modal" class="small-modal">
+    <div class="modal-head">
+      <h3>선수 추가</h3>
+      <button class="modal-close" aria-label="닫기">✕</button>
+    </div>
+    <form id="player-add-form" class="admin-form">
+      <label class="field">이름 <input type="text" id="pa-name" placeholder="홍길동" autocomplete="off" required /></label>
+      <label class="field">학년
+        <select id="pa-grade">
+          <option value="">선택 안 함</option>
+          <option value="1">1학년</option>
+          <option value="2">2학년</option>
+          <option value="3">3학년</option>
+          <option value="4">4학년</option>
+          <option value="대학원">대학원</option>
+          <option value="졸업">졸업</option>
+        </select>
+      </label>
+      <label class="field">학과 <input type="text" id="pa-major" placeholder="예: 컴퓨터공학과" autocomplete="off" /></label>
+      <p id="pa-error" class="admin-error"></p>
+      <button type="submit" id="pa-submit" class="btn">추가</button>
+    </form>
+  </dialog>
+
   <!-- 확인/입력 창 (브라우저 기본 confirm·prompt 대신 — 카카오톡 인앱 브라우저 등에서 막히지 않도록) -->
   <dialog id="ask-modal" class="small-modal">
     <div class="modal-head">
@@ -182,7 +222,7 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="config.js?v=20261115014846"></script>
-  <script src="app.js?v=20261115014846"></script>
+  <script src="config.js?v=20261115020323"></script>
+  <script src="app.js?v=20261115020323"></script>
 </body>
 </html>

@@ -85,7 +85,7 @@ button { font-family: inherit; }
 .c-title span:last-child { font-size: 15px; font-weight: 700; }
 
 /* ---------- Hero (회색 패턴 + 카드) ---------- */
-.hero {
+.hero, .players-hero {
   background-color: #ececec;
   /* 간단한 육각형 패턴 */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='104' viewBox='0 0 120 104'%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='10' opacity='.55'%3E%3Cpath d='M30 4 L58 20 L58 52 L30 68 L2 52 L2 20 Z'/%3E%3Cpath d='M90 56 L118 72 L118 104'/%3E%3Cpath d='M90 56 L62 72 L62 104'/%3E%3Cpath d='M90 -48 L118 -32 L118 0 L90 16 L62 0'/%3E%3C/g%3E%3C/svg%3E");
@@ -471,6 +471,45 @@ body.admin .admin-link { color: #fff; border-color: var(--green); background: va
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 .toast.error { background: var(--red); }
 
+/* ---------- 선수 탭 ---------- */
+.players-hero {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 250px; padding: 30px 16px;
+}
+.players-hero-logo { height: 150px; width: auto; display: block; }
+body.admin .admin-hide { display: none !important; }
+.add-player-btn {
+  font-weight: 900; font-size: 22px; padding: 18px 40px; border-radius: 999px; cursor: pointer;
+  background: var(--green); color: #fff; border: 0; box-shadow: 0 6px 18px rgba(0,0,0,.15);
+}
+.add-player-btn:hover { background: var(--green-dark); }
+.players-count { text-align: center; color: var(--muted); font-size: 14px; margin: -20px 0 36px; }
+.players-list { max-width: 760px; margin: 0 auto; }
+.player-card {
+  display: grid; grid-template-columns: 180px 1fr; gap: 40px; align-items: center;
+  padding: 36px 0; border-top: 1px solid var(--line); cursor: pointer;
+}
+.player-card:first-child { border-top: 0; }
+.player-card:hover .player-name { color: var(--green); }
+.player-photo {
+  width: 180px; height: 180px; border-radius: 16px;
+  background: #e8e8e8 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='15' r='7' fill='%23c2c2c2'/%3E%3Cpath d='M6 37c1.5-8 7-12 14-12s12.5 4 14 12' fill='%23c2c2c2'/%3E%3C/svg%3E") center / 80% no-repeat;
+}
+.player-name { margin: 0; font-size: 30px; font-weight: 900; line-height: 1.2; transition: color .15s; }
+.player-meta { margin: 8px 0 0; font-size: 17px; font-weight: 700; }
+.player-status { margin: 14px 0 0; font-size: 14px; color: var(--muted); }
+.muted-txt { color: #bbb; font-weight: 500; }
+.pending-chip {
+  display: inline-block; vertical-align: middle; margin-left: 10px; font-size: 12px; font-weight: 700;
+  padding: 2px 8px; border-radius: 6px; background: var(--soft); color: var(--muted);
+}
+.field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 700; color: var(--muted); }
+.field input, .field select {
+  font: inherit; font-size: 16px; color: #000; padding: 10px 12px; border-radius: 8px;
+  border: 2px solid var(--line); background: #fff;
+}
+.field input:focus, .field select:focus { outline: none; border-color: var(--green); }
+
 /* ---------- Footer ---------- */
 .footer { background: #000; color: #fff; }
 .footer-inner { max-width: 1200px; margin: 0 auto; padding: 48px 24px 56px; text-align: center; }
@@ -515,6 +554,14 @@ body.admin .admin-link { color: #fff; border-color: var(--green); background: va
   .calc-row input { padding: 9px 8px; font-size: 14px; }
   .rules { padding: 22px 18px; }
   .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .players-hero { min-height: 170px; }
+  .players-hero-logo { height: 96px; }
+  .add-player-btn { font-size: 18px; padding: 14px 30px; }
+  .player-card { grid-template-columns: 96px 1fr; gap: 18px; padding: 22px 0; }
+  .player-photo { width: 96px; height: 96px; border-radius: 12px; }
+  .player-name { font-size: 22px; }
+  .player-meta { font-size: 14px; margin-top: 4px; }
+  .player-status { font-size: 12px; margin-top: 8px; }
   .stat { padding: 10px 4px; }
   .stat .v { font-size: 17px; }
   .stat .k { font-size: 11px; }

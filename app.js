@@ -9,7 +9,7 @@
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 
   const state = {
-    entries: [], games: [], ranking: [], placing: [], all: [], roster: [],
+    entries: [], games: [], ranking: [], placing: [], all: [], roster: [], rosterCsv: [], rosterInfo: new Map(),
     search: "", loadedAt: null, showAll: false,
     admin: false, extraNames: [],
   };
@@ -157,9 +157,13 @@
     try {
       const o = JSON.parse(localStorage.getItem(OVERLAY_KEY) || "{}");
       const fresh = (x) => Date.now() - x.t < OVERLAY_TTL;
-      return { adds: (o.adds || []).filter(fresh), dels: (o.dels || []).filter(fresh) };
+      return {
+        adds: (o.adds || []).filter(fresh),
+        dels: (o.dels || []).filter(fresh),
+        players: (o.players || []).filter(fresh),
+      };
     } catch {
-      return { adds: [], dels: [] };
+      return { adds: [], dels: [], players: [] };
     }
   }
   function saveOverlay(o) {
@@ -252,12 +256,24 @@
     return { ranked, placing, all };
   }
 
-  /** 참가자 명단 CSV: A열 이름 (첫 줄 '이름' 헤더는 건너뜀) */
+  /** 참가자 명단 CSV: A열 이름 · B열 학년 · C열 학과 (첫 줄 '이름' 헤더는 건너뜀) */
   function parseRoster(text) {
-    const names = parseCSV(text)
-      .map((r) => (r[0] || "").trim())
-      .filter((n, i) => n && !(i === 0 && /^(이름|선수|name)/i.test(n)));
-    return [...new Set(names)];
+    const seen = new Set();
+    return parseCSV(text)
+      .map((r) => ({ name: (r[0] || "").trim(), grade: (r[1] || "").trim(), major: (r[2] || "").trim() }))
+      .filter((p, i) => p.name && !(i === 0 && /^(이름|선수|name)/i.test(p.name)))
+      .filter((p) => !seen.has(p.name) && seen.add(p.name));
+  }
+
+  /** CSV 명단 + 이 브라우저에서 방금 추가한 선수(아직 CSV 반영 전) */
+  function mergeRoster() {
+    const o = loadOverlay();
+    const csvNames = new Set(state.rosterCsv.map((p) => p.name));
+    o.players = o.players.filter((p) => !csvNames.has(p.name)); // CSV에 들어온 건 정리
+    saveOverlay(o);
+    const list = [...state.rosterCsv, ...o.players.map((p) => ({ ...p, pending: true }))];
+    state.roster = list.map((p) => p.name);
+    state.rosterInfo = new Map(list.map((p) => [p.name, p]));
   }
 
   // ---------- 데이터 로드 ----------
@@ -280,7 +296,7 @@
         // 참가자 명단은 없어도 동작 — 실패하면 빈 명단
         C.playersCsvUrl ? getCSV(bust(C.playersCsvUrl)).catch(() => null) : null,
       ]);
-      if (rosterText !== null) state.roster = parseRoster(rosterText);
+      if (rosterText !== null) state.rosterCsv = parseRoster(rosterText);
       const { entries, problems } = rowsToEntries(parseCSV(text));
       state.entries = entries;
       rebuild();
@@ -301,6 +317,7 @@
 
   /** 마지막으로 읽은 CSV + 이 브라우저의 추가/삭제 내역으로 다시 계산 */
   function rebuild() {
+    mergeRoster();
     state.games = entriesToGames(applyOverlay(state.entries));
     const built = buildRanking(state.games);
     state.ranking = built.ranked;
@@ -317,6 +334,7 @@
     }
     renderPodium();
     renderRanking();
+    renderPlayers();
     renderBoards();
     renderGames();
     if ($(".name-sel")) fillCalcNames();
@@ -431,6 +449,47 @@
           </div>`)
           .join("")}
       </div>`;
+  }
+
+  // ---------- 선수 탭 ----------
+  const fmtGrade = (g) => (/^\d+$/.test(g) ? `${g}학년` : g);
+
+  function renderPlayers() {
+    const el = $("#players-list");
+    if (!el) return;
+    // 명단 순서대로, 명단에 없지만 대국 기록에 나온 선수는 뒤에 가나다순
+    const byName = new Map(state.all.map((s) => [s.name, s]));
+    const extra = state.all
+      .map((s) => s.name)
+      .filter((n) => !state.rosterInfo.has(n))
+      .sort((a, b) => a.localeCompare(b, "ko"));
+    const names = [...state.roster, ...extra];
+    $("#players-count").textContent = names.length ? `총 ${names.length}명` : "";
+    if (!names.length) {
+      el.innerHTML = `<div class="empty">아직 등록된 선수가 없어요.</div>`;
+      return;
+    }
+    el.innerHTML = names
+      .map((name) => {
+        const info = state.rosterInfo.get(name) || {};
+        const s = byName.get(name);
+        const meta = [info.grade && fmtGrade(info.grade), info.major].filter(Boolean).join(" · ");
+        const status = !s || !s.games
+          ? "아직 대국 없음"
+          : s.place
+            ? `종합 ${s.place}위 · ${fmtTotal(s.pt)}pt · ${s.games}국`
+            : `배치 중 ${s.games}/${MIN_GAMES} · ${fmtTotal(s.pt)}pt`;
+        return `
+        <article class="player-card" data-player="${esc(name)}">
+          <div class="player-photo" aria-hidden="true"></div>
+          <div class="player-info">
+            <h3 class="player-name">${esc(name)}${info.pending ? `<span class="pending-chip">반영 대기</span>` : ""}</h3>
+            <p class="player-meta">${meta ? esc(meta) : `<span class="muted-txt">학년 · 학과 미입력</span>`}</p>
+            <p class="player-status">${status}</p>
+          </div>
+        </article>`;
+      })
+      .join("");
   }
 
   function renderBoards() {
@@ -1111,6 +1170,47 @@
       }
     });
     $("#save-game").addEventListener("click", saveGame);
+
+    // 선수 추가 (운영자)
+    $("#add-player").addEventListener("click", () => {
+      $("#player-add-form").reset();
+      $("#pa-error").textContent = "";
+      showDialog("#player-add-modal");
+      $("#pa-name").focus();
+    });
+    $("#player-add-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = $("#pa-name").value.trim();
+      const grade = $("#pa-grade").value;
+      const major = $("#pa-major").value.trim();
+      const err = $("#pa-error");
+      if (!name) return (err.textContent = "이름을 입력하세요.");
+      if (state.all.some((s) => s.name === name) || state.rosterInfo.has(name)) {
+        return (err.textContent = "이미 있는 이름이에요.");
+      }
+      const btn = $("#pa-submit");
+      btn.disabled = true;
+      btn.textContent = "추가 중…";
+      err.textContent = "";
+      try {
+        await api("addPlayer", { name, grade, major });
+        const o = loadOverlay();
+        o.players.push({ name, grade, major, t: Date.now() });
+        saveOverlay(o);
+        rebuild();
+        render();
+        fillCalcNames();
+        $("#player-add-modal").close();
+        toast(`${name} 선수를 추가했어요.`);
+      } catch (ex) {
+        err.textContent = ex.message.includes("알 수 없는 요청")
+          ? "Apps Script를 새 코드로 업데이트해야 해요. (선수 추가 기능)"
+          : ex.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "추가";
+      }
+    });
 
     // 같은 탭에서 새로고침해도 운영자 모드 유지 (탭을 닫으면 해제)
     try {

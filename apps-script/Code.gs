@@ -12,6 +12,7 @@
 
 const ADMIN_PASSWORD = '여기에-운영자-비밀번호'; // ← 꼭 바꾸세요
 const SHEET_NAME = ''; // 비워두면 첫 번째 시트를 사용
+const PLAYER_SHEET_NAME = '선수'; // 참가자 명단 시트 (A 이름 | B 학년 | C 학과)
 
 function doPost(e) {
   // 동시에 두 명이 수정하는 걸 막는 잠금. 잠금을 못 얻어도(구글 쪽 지연 등) 그냥 진행함
@@ -31,6 +32,8 @@ function doPost(e) {
         return out(addGame_(sheet, req));
       case 'delete':
         return out(deleteGame_(sheet, req));
+      case 'addPlayer':
+        return out(addPlayer_(req));
       default:
         return out({ ok: false, error: '알 수 없는 요청이에요.' });
     }
@@ -114,6 +117,22 @@ function deleteGame_(sheet, req) {
   }
   sheet.deleteRow(target);
   return { ok: true, row: target };
+}
+
+function addPlayer_(req) {
+  const name = String(req.name || '').trim();
+  const grade = String(req.grade || '').trim();
+  const major = String(req.major || '').trim();
+  if (!name) throw new Error('이름을 입력하세요.');
+  const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(PLAYER_SHEET_NAME);
+  if (!sh) throw new Error("'" + PLAYER_SHEET_NAME + "' 시트를 찾지 못했어요.");
+  // 헤더가 없으면 채워줌
+  if (sh.getLastRow() === 0) sh.appendRow(['이름', '학년', '학과']);
+  if (sh.getRange(1, 2).getValue() === '') sh.getRange(1, 2, 1, 2).setValues([['학년', '학과']]);
+  const names = sh.getRange(1, 1, sh.getLastRow(), 1).getValues().map(function (r) { return String(r[0]).trim(); });
+  if (names.indexOf(name) >= 0) throw new Error('이미 등록된 이름이에요.');
+  sh.appendRow([name, grade, major]);
+  return { ok: true };
 }
 
 function out(obj) {
