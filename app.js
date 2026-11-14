@@ -2,8 +2,12 @@
   "use strict";
 
   const C = window.CONFIG || {};
-  /** 프로필 사진 자리 (지금은 빈 칸 — 회색 원에 사람 실루엣) */
-  const AVATAR = `<span class="avatar" aria-hidden="true"></span>`;
+  /** 프로필 사진: img/players/<이름>.jpg 가 있으면 사진, 없으면 회색 실루엣 */
+  const PHOTOS = new Set(window.PLAYER_PHOTOS || []);
+  const photoUrl = (name) => (PHOTOS.has(name) ? `img/players/${encodeURIComponent(name)}.jpg` : "");
+  const photoStyle = (name) => (photoUrl(name) ? ` style="background-image:url('${photoUrl(name)}')"` : "");
+  const avatar = (name) =>
+    `<span class="avatar${photoUrl(name) ? " has-photo" : ""}"${photoStyle(name)} aria-hidden="true"></span>`;
   const SEATS = ["東", "南", "西", "北"];
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -400,7 +404,7 @@
           return `
         <div class="rank-row is-placing" data-player="${esc(s.name)}" title="배치 ${MIN_GAMES}판을 마치면 순위가 매겨져요">
           <span class="badge badge-placing">배치</span>
-          <span class="rk-name">${AVATAR}<span class="rk-text">${esc(s.name)}<small>${sub}</small></span></span>
+          <span class="rk-name">${avatar(s.name)}<span class="rk-text">${esc(s.name)}<small>${sub}</small></span></span>
           <span class="rk-pt">${fmtTotal(s.pt)}pt<small>(${fmtPt(s.pt)})</small></span>
           <span class="rk-diff"></span>
           <span class="rk-games hide-sm">${s.games}</span>
@@ -414,7 +418,7 @@
         return `
         <div class="rank-row" data-player="${esc(s.name)}">
           <span class="badge ${badge}">${s.place}</span>
-          <span class="rk-name">${AVATAR}<span class="rk-text">${esc(s.name)}<small>평균 ${s.avgRank.toFixed(2)}위 · ${s.ranks.join("-")}</small></span></span>
+          <span class="rk-name">${avatar(s.name)}<span class="rk-text">${esc(s.name)}<small>평균 ${s.avgRank.toFixed(2)}위 · ${s.ranks.join("-")}</small></span></span>
           <span class="rk-pt">${fmtTotal(s.pt)}pt<small>(${fmtPt(s.pt)})</small></span>
           <span class="rk-diff">${diff}</span>
           <span class="rk-games hide-sm">${s.games}</span>
@@ -485,7 +489,7 @@
             : `배치 중 ${s.games}/${MIN_GAMES} · ${fmtTotal(s.pt)}pt`;
         return `
         <article class="player-card" data-player="${esc(name)}">
-          <div class="player-photo" aria-hidden="true"></div>
+          <div class="player-photo${photoUrl(name) ? " has-photo" : ""}"${photoStyle(name)} aria-hidden="true"></div>
           <div class="player-info">
             <h3 class="player-name">${esc(name)}${info.pending ? `<span class="pending-chip">반영 대기</span>` : ""}</h3>
             <p class="player-meta">${meta ? esc(meta) : `<span class="muted-txt">학년 · 학과 미입력</span>`}</p>
@@ -539,12 +543,12 @@
             .map((s) => s.placing ? `
             <div class="board-row is-placing" data-player="${esc(s.name)}" title="배치 ${s.games}/${MIN_GAMES}">
               <span class="n">배치</span>
-              <span class="b-name">${AVATAR}<span>${esc(s.name)}</span></span>
+              <span class="b-name">${avatar(s.name)}<span>${esc(s.name)}</span></span>
               <span class="v">${b.fmt(s[b.key])}</span>
             </div>` : `
             <div class="board-row ${s.bPlace <= 3 ? "p" + s.bPlace : ""}" data-player="${esc(s.name)}">
               <span class="n">${s.bPlace === 1 ? "<span>1</span>" : s.bPlace}</span>
-              <span class="b-name">${AVATAR}<span>${esc(s.name)}</span></span>
+              <span class="b-name">${avatar(s.name)}<span>${esc(s.name)}</span></span>
               <span class="v">${b.fmt(s[b.key])}</span>
             </div>`)
             .join("")}
@@ -611,9 +615,9 @@
   function openPlayer(name) {
     const s = state.all.find((x) => x.name === name);
     if (!s) return;
-    $("#pm-name").textContent = s.place
+    $("#pm-name").innerHTML = avatar(s.name) + `<span>${esc(s.place
       ? `${s.place}위 · ${s.name}`
-      : `배치 중 ${s.games}/${MIN_GAMES} · ${s.name}`;
+      : `배치 중 ${s.games}/${MIN_GAMES} · ${s.name}`)}</span>`;
     if (!s.games) {
       $("#pm-body").innerHTML = `<div class="empty">아직 대국 기록이 없어요.<br>${MIN_GAMES}판을 치면 랭킹에 올라가요.</div>`;
       return showDialog("#player-modal");

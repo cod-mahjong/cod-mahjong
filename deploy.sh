@@ -4,7 +4,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 v=$(date +%Y%m%d%H%M%S)
-sed -i -E "s/(style\.css|config\.js|app\.js)\?v=[0-9]+/\1?v=$v/g" index.html
+sed -i -E "s/(style\.css|config\.js|app\.js|photos\.js)\?v=[0-9]+/\1?v=$v/g" index.html
 git add -A
 git commit -q -m "${1:-사이트 업데이트}" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 git push -q origin main
