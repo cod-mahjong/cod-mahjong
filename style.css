@@ -564,9 +564,14 @@ body.admin .admin-hide { display: none !important; }
   .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
   .rule-chapter { font-size: 17px; margin: 44px 0 24px; }
   .rule-article + .rule-article { margin-top: 30px; }
-  .rule-head { font-size: 13px; padding: 9px 14px; }
-  .rule-head span { display: inline-block; max-width: calc(50% - 14px); }
-  .rule-head i { width: 11px; height: 11px; }
+  /* 좁은 화면: 알약이 작은 천점봉 막대로 줄고, 제목은 그 아래 가운데 */
+  .rule-head { background: none; padding: 0; text-align: center; font-size: 17px; border-radius: 0; }
+  .rule-head::before {
+    content: ""; display: block; width: 150px; height: 10px; margin: 0 auto;
+    border-radius: 999px; background: #ededed;
+  }
+  .rule-head i { top: 5px; width: 8px; height: 8px; }
+  .rule-head span { display: block; margin-top: 14px; }
   .rule-text, .rule-list { padding: 0 8px; font-size: 14px; margin-top: 16px; }
   .rule-list { padding-left: 28px; }
   .players-hero { min-height: 170px; }
