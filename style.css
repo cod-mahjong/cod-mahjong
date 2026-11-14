@@ -245,13 +245,15 @@ button { font-family: inherit; }
 .board-row + .board-row { margin-top: 2px; }
 .board-row .n { text-align: center; font-family: "Noto Sans", sans-serif; }
 .board-row .v { text-align: right; }
-.board-row.p1 { background: var(--green-dark); color: #fff; font-weight: 700; }
+/* 1위: 크고 가장 두껍게 / 2·3위: 두껍게 / 4위~: 보통 */
+.board-row.p1 { background: var(--green-dark); color: #fff; font-weight: 900; font-size: 16px; height: 48px; }
+.board-row.p1 .avatar { width: 32px; height: 32px; }
 .board-row.p1 .n span {
   display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%;
   background: #fff; color: var(--green-dark); font-weight: 900; font-size: 15px;
 }
 .board-row.p2 .n, .board-row.p3 .n { font-weight: 900; font-size: 20px; }
-.board-row.p2, .board-row.p3 { font-weight: 700; }
+.board-row.p2, .board-row.p3 { font-weight: 900; font-size: 15px; }
 .board-row:not(.p1):hover { background: var(--soft); }
 .board-row.is-placing { color: #b5b5b5; font-weight: 400; }
 .board-row.is-placing .n { font-family: inherit; font-size: 11px; font-weight: 700; color: #c0c0c0; }
