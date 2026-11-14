@@ -366,7 +366,7 @@ dialog::backdrop { background: rgba(0,0,0,.55); }
 .modal-head h3 { margin: 0; font-size: 21px; font-weight: 900; }
 .modal-close { border: 2px solid #fff; background: none; color: #fff; border-radius: 50%; width: 34px; height: 34px; cursor: pointer; font-size: 15px; }
 #pm-body { padding: 20px 22px 24px; }
-.stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px; }
 .stat { border: 2px solid var(--line); border-radius: 10px; padding: 12px 8px; text-align: center; }
 .stat .v { font-weight: 900; font-size: 19px; }
 .stat .k { font-size: 12px; color: var(--muted); margin-top: 2px; }
@@ -512,7 +512,7 @@ body.admin .admin-link { color: #fff; border-color: var(--green); background: va
   .calc-row { grid-template-columns: 26px 1fr 96px 70px; gap: 6px; }
   .calc-row input { padding: 9px 8px; font-size: 14px; }
   .rules { padding: 22px 18px; }
-  .stat-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
   .stat { padding: 10px 4px; }
   .stat .v { font-size: 17px; }
   .stat .k { font-size: 11px; }
