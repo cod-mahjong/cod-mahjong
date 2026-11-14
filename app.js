@@ -678,7 +678,8 @@
     const base = `<line x1="${CH.L}" x2="${CH.W - CH.R}" y1="${y(BASE)}" y2="${y(BASE)}" stroke="${G}" stroke-opacity=".4" stroke-width="1.5" stroke-dasharray="5 4"/>
       <text x="${CH.W - CH.R}" y="${y(BASE) - 5}" text-anchor="end" font-size="10.5" fill="${G}" fill-opacity=".7">시작 ${BASE}</text>`;
     const pts = list.map((h, i) => `${x(i)},${y(BASE + h.cum)}`).join(" ");
-    const area = n > 1 ? `<polygon points="${x(0)},${T + ph} ${pts} ${x(n - 1)},${T + ph}" fill="${G}" fill-opacity=".08"/>` : "";
+    // 시작 점수(500) 선과 그래프 사이만 칠함
+    const area = n > 1 ? `<polygon points="${x(0)},${y(BASE)} ${pts} ${x(n - 1)},${y(BASE)}" fill="${G}" fill-opacity=".12"/>` : "";
     const line = n > 1 ? `<polyline points="${pts}" fill="none" stroke="${G}" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>` : "";
     const dots = list
       .map((h, i) => `<g><title>${esc(h.short)} ${h.no}게임 · ${fmtTotal(h.cum)}pt (${fmtPt(h.pt)})</title><circle cx="${x(i)}" cy="${y(BASE + h.cum)}" r="4.5" fill="#fff" stroke="${G}" stroke-width="3"/></g>`)
