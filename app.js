@@ -440,9 +440,13 @@
             <div class="pl-slots" style="--n:${MIN_GAMES}">
               ${Array.from({ length: MIN_GAMES }, (_, i) => {
                 const h = s.history[i];
+                // 순위 칸 아래에 그 판에서 얻은 pt
                 return h
-                  ? `<span class="slot r${h.rank}" title="${esc(h.short)} ${h.no}게임 · ${fmtPt(h.pt)}">${h.rank}</span>`
-                  : `<span class="slot open"></span>`;
+                  ? `<span class="slot-wrap" title="${esc(h.short)} ${h.no}게임 · ${fmtPt(h.pt)}">
+                       <span class="slot r${h.rank}">${h.rank}</span>
+                       <span class="slot-pt">${fmtPt(h.pt)}</span>
+                     </span>`
+                  : `<span class="slot-wrap"><span class="slot open"></span><span class="slot-pt">&nbsp;</span></span>`;
               }).join("")}
             </div>
             <div class="pl-pt">${fmtPt(s.pt)}pt</div>

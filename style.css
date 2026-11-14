@@ -211,7 +211,7 @@ button { font-family: inherit; }
 .placing:empty { display: none; }
 .placing-title { font-size: 17px; font-weight: 900; margin: 0 0 14px; padding-left: 12px; border-left: 5px solid var(--gray); }
 .placing-title small { font-size: 13px; font-weight: 500; color: var(--muted); margin-left: 8px; }
-.placing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+.placing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(225px, 1fr)); gap: 12px; }
 .pl-chip {
   padding: 12px 14px; border: 2px solid var(--line); border-radius: 12px; cursor: pointer;
   display: flex; flex-direction: column; gap: 10px;
@@ -230,6 +230,9 @@ button { font-family: inherit; }
 .slot.r2 { background: var(--green-dark); }
 .slot.r3 { background: #6f9b7c; }
 .slot.r4 { background: var(--gray); }
+.slot-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
+.slot-wrap .slot { width: 100%; }
+.slot-pt { font-size: 10.5px; font-weight: 700; color: #555; letter-spacing: -.3px; white-space: nowrap; line-height: 1; }
 .slot.open { background: none; border: 2px dashed var(--line); }
 .pl-pt { text-align: right; font-weight: 900; font-size: 17px; }
 
