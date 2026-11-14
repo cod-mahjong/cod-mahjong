@@ -561,8 +561,10 @@
       <div class="stat-grid">
         <div class="stat"><div class="v">${fmtTotal(s.pt)}</div><div class="k">현재 점수 (${fmtPt(s.pt)})</div></div>
         <div class="stat"><div class="v">${s.avgRank.toFixed(2)}</div><div class="k">평균 순위</div></div>
+        <div class="stat"><div class="v">${fmtScore(s.best)}</div><div class="k">최고 점수</div></div>
         <div class="stat"><div class="v">${top2.toFixed(0)}%</div><div class="k">연대율 (1·2위)</div></div>
         <div class="stat"><div class="v">${fourth.toFixed(0)}%</div><div class="k">4위율</div></div>
+        <div class="stat"><div class="v">${s.games}</div><div class="k">대국 수</div></div>
       </div>
       <h4 class="pm-sec">보유 점수 <small>최근 ${RECENT_N}국</small></h4>
       ${pointSVG(s.history)}
