@@ -486,13 +486,12 @@ body.admin .admin-hide { display: none !important; }
 .players-count { text-align: center; color: var(--muted); font-size: 14px; margin: -20px 0 36px; }
 .players-list { max-width: 760px; margin: 0 auto; }
 .player-card {
-  display: grid; grid-template-columns: 180px 1fr; gap: 40px; align-items: center;
-  padding: 36px 0; border-top: 1px solid var(--line); cursor: pointer;
+  display: grid; grid-template-columns: 120px 1fr; gap: 32px; align-items: center;
+  padding: 22px 0; cursor: pointer;
 }
-.player-card:first-child { border-top: 0; }
 .player-card:hover .player-name { color: var(--green); }
 .player-photo {
-  width: 180px; height: 180px; border-radius: 16px;
+  width: 120px; height: 120px; border-radius: 14px;
   background: #e8e8e8 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='15' r='7' fill='%23c2c2c2'/%3E%3Cpath d='M6 37c1.5-8 7-12 14-12s12.5 4 14 12' fill='%23c2c2c2'/%3E%3C/svg%3E") center / 80% no-repeat;
 }
 .player-name { margin: 0; font-size: 30px; font-weight: 900; line-height: 1.2; transition: color .15s; }
@@ -557,8 +556,8 @@ body.admin .admin-hide { display: none !important; }
   .players-hero { min-height: 170px; }
   .players-hero-logo { height: 96px; }
   .add-player-btn { font-size: 18px; padding: 14px 30px; }
-  .player-card { grid-template-columns: 96px 1fr; gap: 18px; padding: 22px 0; }
-  .player-photo { width: 96px; height: 96px; border-radius: 12px; }
+  .player-card { grid-template-columns: 72px 1fr; gap: 16px; padding: 14px 0; }
+  .player-photo { width: 72px; height: 72px; border-radius: 10px; }
   .player-name { font-size: 22px; }
   .player-meta { font-size: 14px; margin-top: 4px; }
   .player-status { font-size: 12px; margin-top: 8px; }
