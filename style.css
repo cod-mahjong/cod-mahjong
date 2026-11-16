@@ -537,6 +537,26 @@ body.admin .edit-btn.admin-only { display: inline-block !important; }
 .pe-photo-row .player-photo { width: 100px; height: 100px; flex-shrink: 0; }
 .pe-file-btn { display: inline-block; text-align: center; }
 
+/* 칭호 */
+.title-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.title-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 12px; font-weight: 900; line-height: 1; padding: 5px 9px; border-radius: 999px;
+  background: var(--soft); color: #333; border: 1.5px solid transparent; white-space: nowrap;
+}
+.title-badge.t-r1 { background: #fff4d6; color: #8a6100; border-color: #e3b341; }
+.title-badge.t-r2 { background: #eef1f3; color: #555f66; border-color: #aab4ba; }
+.title-badge.t-r3 { background: #f8ece2; color: #8a4f1f; border-color: #c98a55; }
+.title-badge.t-rec { background: #e8f4ec; color: var(--green-dark); border-color: #9fcdb0; }
+.title-badge.t-yaku { background: #1a1a1a; color: #fff; border-color: var(--red); }
+.title-inline { display: inline-flex; gap: 4px; margin-left: 8px; vertical-align: 2px; }
+.title-inline .title-badge { font-size: 10.5px; padding: 3px 7px; }
+.pm-titles { margin: 0 0 14px; }
+.chip-x { background: none; border: 0; color: inherit; cursor: pointer; font-size: 11px; padding: 0 0 0 2px; opacity: .8; }
+.pe-yaku-row { display: flex; gap: 8px; margin-top: 8px; }
+.pe-yaku-row select { flex: 1; }
+.pe-yaku-row .btn-outline { padding: 8px 16px; }
+
 /* ---------- Footer ---------- */
 .footer { background: #000; color: #fff; }
 .footer-inner { max-width: 1200px; margin: 0 auto; padding: 48px 24px 56px; text-align: center; }

@@ -149,18 +149,20 @@ function updatePlayer_(req) {
 
   const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(PLAYER_SHEET_NAME);
   if (!sh) throw new Error("'" + PLAYER_SHEET_NAME + "' 시트를 찾지 못했어요.");
-  if (sh.getLastRow() === 0) sh.appendRow(['이름', '학년', '학과', '사진']);
-  if (sh.getRange(1, 4).getValue() === '') sh.getRange(1, 2, 1, 3).setValues([['학년', '학과', '사진']]);
+  const titles = req.titles === undefined ? null : String(req.titles).trim(); // E열: 역만 칭호 (쉼표로 구분)
+  if (sh.getLastRow() === 0) sh.appendRow(['이름', '학년', '학과', '사진', '칭호']);
+  if (sh.getRange(1, 5).getValue() === '') sh.getRange(1, 2, 1, 4).setValues([['학년', '학과', '사진', '칭호']]);
 
   const names = sh.getRange(1, 1, sh.getLastRow(), 1).getValues().map(function (r) { return String(r[0]).trim(); });
   let row = names.indexOf(name) + 1;
   if (row < 1) {
     // 명단에 없던 선수(대국 기록에만 있던 선수)는 새 줄로 추가
-    sh.appendRow([name, grade, major, photo]);
+    sh.appendRow([name, grade, major, photo, titles || '']);
     return { ok: true, added: true };
   }
   sh.getRange(row, 2, 1, 2).setValues([[grade, major]]);
   if (photo) sh.getRange(row, 4).setValue(photo);
+  if (titles !== null) sh.getRange(row, 5).setValue(titles);
   return { ok: true };
 }
 

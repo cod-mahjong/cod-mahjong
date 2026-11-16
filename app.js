@@ -274,6 +274,7 @@
         grade: (r[1] || "").trim(),
         major: (r[2] || "").trim(),
         photo: /^data:image\//.test((r[3] || "").trim()) ? r[3].trim() : "",
+        titles: (r[4] || "").split(",").map((t) => t.trim()).filter(Boolean), // E열: 역만 칭호
       }))
       .filter((p, i) => p.name && !(i === 0 && /^(이름|선수|name)/i.test(p.name)))
       .filter((p) => !seen.has(p.name) && seen.add(p.name));
@@ -289,12 +290,15 @@
     const csvBy = new Map(state.rosterCsv.map((p) => [p.name, p]));
     o.edits = o.edits.filter((e) => {
       const c = csvBy.get(e.name);
-      return !(c && c.grade === e.grade && c.major === e.major && (!e.photo || c.photo === e.photo));
+      return !(c && c.grade === e.grade && c.major === e.major && (!e.photo || c.photo === e.photo)
+        && (e.titles === undefined || (c.titles || []).join(",") === e.titles.join(",")));
     });
     saveOverlay(o);
     const list = [...state.rosterCsv, ...o.players.map((p) => ({ ...p, pending: true }))].map((p) => {
       const e = o.edits.filter((x) => x.name === p.name).pop();
-      return e ? { ...p, grade: e.grade, major: e.major, photo: e.photo || p.photo, pending: true } : p;
+      return e
+        ? { ...p, grade: e.grade, major: e.major, photo: e.photo || p.photo, titles: e.titles ?? p.titles, pending: true }
+        : p;
     });
     state.roster = list.map((p) => p.name);
     state.rosterInfo = new Map(list.map((p) => [p.name, p]));
@@ -353,7 +357,44 @@
     state.ranking = built.ranked;
     state.placing = built.placing;
     state.all = built.all;
+    state.titles = computeTitles();
   }
+
+  // ---------- 칭호 ----------
+  const T = Object.assign(
+    { rank: ["종합 1위", "종합 2위", "종합 3위"], best: "최고 점수왕", avoid: "철벽", tops: "탑 머신", avg: "안정왕", yakuman: "역만" },
+    C.titles || {}
+  );
+  const YAKUMAN = ["국사무쌍", "스안커", "대삼원", "소사희", "대사희", "자일색", "녹일색", "청노두", "구련보등", "스깡쯔", "천화", "지화",
+    "국사무쌍 13면 대기", "스안커 단기", "순정구련보등"];
+
+  /** 이름 → [{text, kind}] — 배치를 마친 선수만 자동 칭호, 역만은 운영자가 단 칭호 */
+  function computeTitles() {
+    const map = new Map();
+    const add = (name, text, kind) => {
+      if (!map.has(name)) map.set(name, []);
+      map.get(name).push({ text, kind });
+    };
+    const ranked = state.ranking;
+    ranked.forEach((s) => { if (s.place <= 3) add(s.name, T.rank[s.place - 1], "r" + s.place); });
+    if (ranked.length) {
+      const leaders = (val, better) => {
+        const top = ranked.reduce((m, s) => (better(val(s), m) ? val(s) : m), val(ranked[0]));
+        return ranked.filter((s) => val(s) === top);
+      };
+      const hi = (a, b) => a > b, lo = (a, b) => a < b;
+      leaders((s) => s.best, hi).forEach((s) => add(s.name, T.best, "rec"));
+      leaders((s) => (s.games - s.ranks[3]) / s.games, hi).forEach((s) => add(s.name, T.avoid, "rec"));
+      const topCount = Math.max(...ranked.map((s) => s.ranks[0]));
+      if (topCount > 0) ranked.filter((s) => s.ranks[0] === topCount).forEach((s) => add(s.name, T.tops, "rec"));
+      leaders((s) => s.avgRank, lo).forEach((s) => add(s.name, T.avg, "rec"));
+    }
+    state.rosterInfo.forEach((p, name) => (p.titles || []).forEach((y) => add(name, `${T.yakuman} · ${y}`, "yaku")));
+    return map;
+  }
+
+  const titleBadges = (name) =>
+    (state.titles?.get(name) || []).map((t) => `<span class="title-badge t-${t.kind}">${esc(t.text)}</span>`).join("");
 
   // ---------- 렌더링 ----------
   function render() {
@@ -444,7 +485,7 @@
         return `
         <div class="rank-row" data-player="${esc(s.name)}">
           <span class="badge ${badge}">${s.place}</span>
-          <span class="rk-name">${avatar(s.name)}<span class="rk-text">${esc(s.name)}<small>평균 ${s.avgRank.toFixed(2)}위 · ${s.ranks.join("-")}</small></span></span>
+          <span class="rk-name">${avatar(s.name)}<span class="rk-text">${esc(s.name)}<span class="title-inline hide-sm">${titleBadges(s.name)}</span><small>평균 ${s.avgRank.toFixed(2)}위 · ${s.ranks.join("-")}</small></span></span>
           <span class="rk-pt">${fmtTotal(s.pt)}pt<small>(${fmtPt(s.pt)})</small></span>
           <span class="rk-diff">${diff}</span>
           <span class="rk-games hide-sm">${s.games}</span>
@@ -520,6 +561,7 @@
           <div class="player-info">
             <h3 class="player-name">${esc(name)}${info.pending ? `<span class="pending-chip">반영 대기</span>` : ""}</h3>
             <p class="player-meta">${meta ? esc(meta) : `<span class="muted-txt">학년 · 학과 미입력</span>`}</p>
+            ${titleBadges(name) ? `<div class="title-row">${titleBadges(name)}</div>` : ""}
             <p class="player-status">${status}</p>
           </div>
         </article>`;
@@ -645,14 +687,15 @@
     $("#pm-name").innerHTML = avatar(s.name) + `<span>${esc(s.place
       ? `${s.place}위 · ${s.name}`
       : `배치 중 ${s.games}/${MIN_GAMES} · ${s.name}`)}</span>`;
+    const titlesHtml = titleBadges(s.name) ? `<div class="title-row pm-titles">${titleBadges(s.name)}</div>` : "";
     if (!s.games) {
-      $("#pm-body").innerHTML = `<div class="empty">아직 대국 기록이 없어요.<br>${MIN_GAMES}판을 치면 랭킹에 올라가요.</div>`;
+      $("#pm-body").innerHTML = titlesHtml + `<div class="empty">아직 대국 기록이 없어요.<br>${MIN_GAMES}판을 치면 랭킹에 올라가요.</div>`;
       return showDialog("#player-modal");
     }
     const top2 = ((s.ranks[0] + s.ranks[1]) / s.games) * 100;
     // 최고 점수: 대회 중 보유 점수가 가장 높이 올라갔던 때의 값과 그 시점
     const peak = s.history.reduce((m, h) => (h.cum > m.cum ? h : m), s.history[0]);
-    $("#pm-body").innerHTML = `
+    $("#pm-body").innerHTML = titlesHtml + `
       <div class="stat-grid">
         <div class="stat"><div class="v">${fmtTotal(s.pt)}</div><div class="k">현재 점수 (${fmtPt(s.pt)})</div></div>
         <div class="stat"><div class="v">${s.avgRank.toFixed(2)}</div><div class="k">평균 순위</div></div>
@@ -1136,7 +1179,13 @@
   }
 
   // ---------- 프로필 편집 (운영자) ----------
-  let editName = "", editPhoto = "";
+  let editName = "", editPhoto = "", editTitles = [];
+
+  function renderEditTitles() {
+    $("#pe-titles").innerHTML = editTitles.length
+      ? editTitles.map((t, i) => `<span class="title-badge t-yaku">${T.yakuman} · ${esc(t)}<button type="button" class="chip-x" data-rm-title="${i}" aria-label="삭제">✕</button></span>`).join("")
+      : `<span class="muted-txt">아직 없음</span>`;
+  }
 
   /** 사진 → 정사각형으로 잘라 줄인 JPEG 데이터 (시트 한 칸 5만 글자 안에 들어가도록) */
   function compressPhoto(file) {
@@ -1177,6 +1226,8 @@
     if (!state.admin) return;
     const info = state.rosterInfo.get(name) || {};
     editName = name;
+    editTitles = [...(info.titles || [])];
+    renderEditTitles();
     editPhoto = "";
     $("#pe-title").textContent = `프로필 편집 · ${name}`;
     $("#pe-grade").value = info.grade || "";
@@ -1197,9 +1248,9 @@
     btn.textContent = "저장 중…";
     err.textContent = "";
     try {
-      await api("updatePlayer", { name: editName, grade, major, photo: editPhoto || undefined });
+      await api("updatePlayer", { name: editName, grade, major, photo: editPhoto || undefined, titles: editTitles.join(",") });
       const o = loadOverlay();
-      o.edits.push({ name: editName, grade, major, photo: editPhoto, t: Date.now() });
+      o.edits.push({ name: editName, grade, major, photo: editPhoto, titles: [...editTitles], t: Date.now() });
       saveOverlay(o);
       rebuild();
       render();
@@ -1369,6 +1420,20 @@
     $("#save-game").addEventListener("click", saveGame);
 
     // 프로필 편집 (운영자)
+    $("#pe-yaku").innerHTML = `<option value="">역만 선택</option>` + YAKUMAN.map((y) => `<option>${y}</option>`).join("");
+    $("#pe-yaku-add").addEventListener("click", () => {
+      const y = $("#pe-yaku").value;
+      if (!y) return;
+      editTitles.push(y);
+      $("#pe-yaku").value = "";
+      renderEditTitles();
+    });
+    $("#pe-titles").addEventListener("click", (e) => {
+      const b = e.target.closest("[data-rm-title]");
+      if (!b) return;
+      editTitles.splice(Number(b.dataset.rmTitle), 1);
+      renderEditTitles();
+    });
     $("#pe-file").addEventListener("change", async (e) => {
       const f = e.target.files[0];
       if (!f) return;
