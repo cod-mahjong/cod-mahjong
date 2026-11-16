@@ -22,7 +22,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Sans:wght@700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=20261115040631" />
+  <link rel="stylesheet" href="style.css?v=20261117031615" />
 </head>
 <body>
   <div class="frame" aria-hidden="true"></div>
@@ -203,6 +203,34 @@
     </form>
   </dialog>
 
+  <!-- 프로필 편집 (운영자) -->
+  <dialog id="player-edit-modal" class="small-modal">
+    <div class="modal-head">
+      <h3 id="pe-title">프로필 편집</h3>
+      <button class="modal-close" aria-label="닫기">✕</button>
+    </div>
+    <form id="player-edit-form" class="admin-form">
+      <div class="pe-photo-row">
+        <div id="pe-photo" class="player-photo" aria-hidden="true"></div>
+        <label class="btn-outline pe-file-btn">사진 변경<input type="file" id="pe-file" accept="image/*" hidden /></label>
+      </div>
+      <label class="field">학년
+        <select id="pe-grade">
+          <option value="">선택 안 함</option>
+          <option value="1">1학년</option>
+          <option value="2">2학년</option>
+          <option value="3">3학년</option>
+          <option value="4">4학년</option>
+          <option value="대학원">대학원</option>
+          <option value="졸업">졸업</option>
+        </select>
+      </label>
+      <label class="field">학과 <input type="text" id="pe-major" placeholder="예: 컴퓨터공학과" autocomplete="off" /></label>
+      <p id="pe-error" class="admin-error"></p>
+      <button type="submit" id="pe-submit" class="btn">저장</button>
+    </form>
+  </dialog>
+
   <!-- 확인/입력 창 (브라우저 기본 confirm·prompt 대신 — 카카오톡 인앱 브라우저 등에서 막히지 않도록) -->
   <dialog id="ask-modal" class="small-modal">
     <div class="modal-head">
@@ -221,8 +249,8 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="img/players/photos.js?v=20261115040631"></script>
-  <script src="config.js?v=20261115040631"></script>
-  <script src="app.js?v=20261115040631"></script>
+  <script src="img/players/photos.js?v=20261117031615"></script>
+  <script src="config.js?v=20261117031615"></script>
+  <script src="app.js?v=20261117031615"></script>
 </body>
 </html>

@@ -34,6 +34,8 @@ function doPost(e) {
         return out(deleteGame_(sheet, req));
       case 'addPlayer':
         return out(addPlayer_(req));
+      case 'updatePlayer':
+        return out(updatePlayer_(req));
       default:
         return out({ ok: false, error: '알 수 없는 요청이에요.' });
     }
@@ -132,6 +134,33 @@ function addPlayer_(req) {
   const names = sh.getRange(1, 1, sh.getLastRow(), 1).getValues().map(function (r) { return String(r[0]).trim(); });
   if (names.indexOf(name) >= 0) throw new Error('이미 등록된 이름이에요.');
   sh.appendRow([name, grade, major]);
+  return { ok: true };
+}
+
+/** 프로필 수정: '선수' 시트에서 이름이 같은 줄의 학년(B)·학과(C)·사진(D)을 바꿈 */
+function updatePlayer_(req) {
+  const name = String(req.name || '').trim();
+  if (!name) throw new Error('이름이 없어요.');
+  const grade = String(req.grade || '').trim();
+  const major = String(req.major || '').trim();
+  const photo = req.photo ? String(req.photo) : '';
+  if (photo && !/^data:image\/(jpeg|png);base64,/.test(photo)) throw new Error('사진 형식이 올바르지 않아요.');
+  if (photo.length > 49000) throw new Error('사진이 너무 커요.');
+
+  const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(PLAYER_SHEET_NAME);
+  if (!sh) throw new Error("'" + PLAYER_SHEET_NAME + "' 시트를 찾지 못했어요.");
+  if (sh.getLastRow() === 0) sh.appendRow(['이름', '학년', '학과', '사진']);
+  if (sh.getRange(1, 4).getValue() === '') sh.getRange(1, 2, 1, 3).setValues([['학년', '학과', '사진']]);
+
+  const names = sh.getRange(1, 1, sh.getLastRow(), 1).getValues().map(function (r) { return String(r[0]).trim(); });
+  let row = names.indexOf(name) + 1;
+  if (row < 1) {
+    // 명단에 없던 선수(대국 기록에만 있던 선수)는 새 줄로 추가
+    sh.appendRow([name, grade, major, photo]);
+    return { ok: true, added: true };
+  }
+  sh.getRange(row, 2, 1, 2).setValues([[grade, major]]);
+  if (photo) sh.getRange(row, 4).setValue(photo);
   return { ok: true };
 }
 

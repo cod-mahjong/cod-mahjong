@@ -524,6 +524,19 @@ body.admin .admin-hide { display: none !important; }
 .rule-list li + li { margin-top: 10px; }
 .rule-list li::marker { font-weight: 900; }
 
+/* 프로필 편집 */
+.player-card { position: relative; }
+.edit-btn {
+  position: absolute; top: 50%; right: 0; transform: translateY(-50%);
+  font-weight: 700; font-size: 13px; padding: 6px 14px; border-radius: 999px; cursor: pointer;
+  background: #fff; color: var(--green); border: 2px solid var(--green);
+}
+.edit-btn:hover { background: var(--green); color: #fff; }
+body.admin .edit-btn.admin-only { display: inline-block !important; }
+.pe-photo-row { display: flex; align-items: center; gap: 18px; }
+.pe-photo-row .player-photo { width: 100px; height: 100px; flex-shrink: 0; }
+.pe-file-btn { display: inline-block; text-align: center; }
+
 /* ---------- Footer ---------- */
 .footer { background: #000; color: #fff; }
 .footer-inner { max-width: 1200px; margin: 0 auto; padding: 48px 24px 56px; text-align: center; }
@@ -594,3 +607,5 @@ body.admin .admin-hide { display: none !important; }
   .pm-table .hide-sm { display: none; }
   .pm-scroll .pm-table td, .pm-scroll .pm-table th { padding: 9px 6px; font-size: 13px; }
 }
+
+body.admin .player-info { padding-right: 72px; }

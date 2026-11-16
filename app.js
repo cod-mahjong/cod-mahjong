@@ -4,7 +4,11 @@
   const C = window.CONFIG || {};
   /** 프로필 사진: img/players/<이름>.jpg 가 있으면 사진, 없으면 회색 실루엣 */
   const PHOTOS = new Set(window.PLAYER_PHOTOS || []);
-  const photoUrl = (name) => (PHOTOS.has(name) ? `img/players/${encodeURIComponent(name)}.jpg` : "");
+  const photoUrl = (name) => {
+    const sheetPhoto = state.rosterInfo && state.rosterInfo.get(name)?.photo;
+    if (sheetPhoto) return sheetPhoto; // 운영자가 사이트에서 올린 사진 (시트 '선수' D열)
+    return PHOTOS.has(name) ? `img/players/${encodeURIComponent(name)}.jpg` : "";
+  };
   const photoStyle = (name) => (photoUrl(name) ? ` style="background-image:url('${photoUrl(name)}')"` : "");
   const avatar = (name) =>
     `<span class="avatar${photoUrl(name) ? " has-photo" : ""}"${photoStyle(name)} aria-hidden="true"></span>`;
@@ -165,9 +169,10 @@
         adds: (o.adds || []).filter(fresh),
         dels: (o.dels || []).filter(fresh),
         players: (o.players || []).filter(fresh),
+        edits: (o.edits || []).filter(fresh),
       };
     } catch {
-      return { adds: [], dels: [], players: [] };
+      return { adds: [], dels: [], players: [], edits: [] };
     }
   }
   function saveOverlay(o) {
@@ -260,11 +265,16 @@
     return { ranked, placing, all };
   }
 
-  /** 참가자 명단 CSV: A열 이름 · B열 학년 · C열 학과 (첫 줄 '이름' 헤더는 건너뜀) */
+  /** 참가자 명단 CSV: A 이름 · B 학년 · C 학과 · D 사진(이미지 데이터) — 첫 줄 '이름' 헤더는 건너뜀 */
   function parseRoster(text) {
     const seen = new Set();
     return parseCSV(text)
-      .map((r) => ({ name: (r[0] || "").trim(), grade: (r[1] || "").trim(), major: (r[2] || "").trim() }))
+      .map((r) => ({
+        name: (r[0] || "").trim(),
+        grade: (r[1] || "").trim(),
+        major: (r[2] || "").trim(),
+        photo: /^data:image\//.test((r[3] || "").trim()) ? r[3].trim() : "",
+      }))
       .filter((p, i) => p.name && !(i === 0 && /^(이름|선수|name)/i.test(p.name)))
       .filter((p) => !seen.has(p.name) && seen.add(p.name));
   }
@@ -275,13 +285,24 @@
     const csvNames = new Set(state.rosterCsv.map((p) => p.name));
     o.players = o.players.filter((p) => !csvNames.has(p.name)); // CSV에 들어온 건 정리
     saveOverlay(o);
-    const list = [...state.rosterCsv, ...o.players.map((p) => ({ ...p, pending: true }))];
+    // 프로필 수정: CSV에 같은 값이 들어오면 정리, 그 전까지는 수정한 값으로 표시
+    const csvBy = new Map(state.rosterCsv.map((p) => [p.name, p]));
+    o.edits = o.edits.filter((e) => {
+      const c = csvBy.get(e.name);
+      return !(c && c.grade === e.grade && c.major === e.major && (!e.photo || c.photo === e.photo));
+    });
+    saveOverlay(o);
+    const list = [...state.rosterCsv, ...o.players.map((p) => ({ ...p, pending: true }))].map((p) => {
+      const e = o.edits.filter((x) => x.name === p.name).pop();
+      return e ? { ...p, grade: e.grade, major: e.major, photo: e.photo || p.photo, pending: true } : p;
+    });
     state.roster = list.map((p) => p.name);
     state.rosterInfo = new Map(list.map((p) => [p.name, p]));
   }
 
   // ---------- 데이터 로드 ----------
-  async function load() {
+  const ROSTER_EVERY = 10 * 60 * 1000;
+  async function load(forceRoster = false) {
     const updated = $("#updated");
     const notice = $("#notice");
     updated.textContent = "불러오는 중…";
@@ -298,9 +319,14 @@
       const [text, rosterText] = await Promise.all([
         getCSV(usingSample ? "data/sample.csv" : bust(C.gamesCsvUrl)),
         // 참가자 명단은 없어도 동작 — 실패하면 빈 명단
-        C.playersCsvUrl ? getCSV(bust(C.playersCsvUrl)).catch(() => null) : null,
+        C.playersCsvUrl && (forceRoster === true || !state.rosterAt || Date.now() - state.rosterAt > ROSTER_EVERY)
+          ? getCSV(bust(C.playersCsvUrl)).catch(() => null)
+          : null,
       ]);
-      if (rosterText !== null) state.rosterCsv = parseRoster(rosterText);
+      if (rosterText !== null) {
+        state.rosterCsv = parseRoster(rosterText);
+        state.rosterAt = Date.now();
+      }
       const { entries, problems } = rowsToEntries(parseCSV(text));
       state.entries = entries;
       rebuild();
@@ -489,6 +515,7 @@
             : `배치 중 ${s.games}/${MIN_GAMES} · ${fmtTotal(s.pt)}pt`;
         return `
         <article class="player-card" data-player="${esc(name)}">
+          <button class="edit-btn admin-only" data-edit="${esc(name)}">편집</button>
           <div class="player-photo${photoUrl(name) ? " has-photo" : ""}"${photoStyle(name)} aria-hidden="true"></div>
           <div class="player-info">
             <h3 class="player-name">${esc(name)}${info.pending ? `<span class="pending-chip">반영 대기</span>` : ""}</h3>
@@ -1088,9 +1115,11 @@
       state.search = e.target.value;
       renderRanking();
     });
-    $("#refresh").addEventListener("click", load);
+    $("#refresh").addEventListener("click", () => load(true));
 
     document.addEventListener("click", (e) => {
+      const ed = e.target.closest("[data-edit]");
+      if (ed) return openEdit(ed.dataset.edit);
       const del = e.target.closest("[data-del]");
       if (del) return deleteGame(Number(del.dataset.del));
       const p = e.target.closest("[data-player]");
@@ -1103,6 +1132,86 @@
 
     if (C.refreshSeconds > 0) {
       setInterval(() => { if (!document.hidden) load(); }, C.refreshSeconds * 1000);
+    }
+  }
+
+  // ---------- 프로필 편집 (운영자) ----------
+  let editName = "", editPhoto = "";
+
+  /** 사진 → 정사각형으로 잘라 줄인 JPEG 데이터 (시트 한 칸 5만 글자 안에 들어가도록) */
+  function compressPhoto(file) {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const w = img.naturalWidth, h = img.naturalHeight, side = Math.min(w, h);
+        const sx = (w - side) / 2;
+        const sy = h > w ? (h - side) * 0.15 : 0; // 세로로 긴 사진은 위쪽(얼굴)을 살림
+        for (const size of [300, 260, 220]) {
+          const c = document.createElement("canvas");
+          c.width = c.height = size;
+          const ctx = c.getContext("2d");
+          ctx.fillStyle = "#fff";
+          ctx.fillRect(0, 0, size, size);
+          ctx.drawImage(img, sx, sy, side, side, 0, 0, size, size);
+          for (const q of [0.85, 0.75, 0.65, 0.55]) {
+            const data = c.toDataURL("image/jpeg", q);
+            if (data.length < 45000) return resolve(data);
+          }
+        }
+        reject(new Error("사진을 충분히 줄이지 못했어요. 다른 사진을 골라주세요."));
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("사진을 읽지 못했어요.")); };
+      img.src = url;
+    });
+  }
+
+  function setEditPreview(src) {
+    const el = $("#pe-photo");
+    el.classList.toggle("has-photo", !!src);
+    el.style.backgroundImage = src ? `url('${src}')` : "";
+  }
+
+  function openEdit(name) {
+    if (!state.admin) return;
+    const info = state.rosterInfo.get(name) || {};
+    editName = name;
+    editPhoto = "";
+    $("#pe-title").textContent = `프로필 편집 · ${name}`;
+    $("#pe-grade").value = info.grade || "";
+    $("#pe-major").value = info.major || "";
+    $("#pe-file").value = "";
+    $("#pe-error").textContent = "";
+    setEditPreview(photoUrl(name));
+    showDialog("#player-edit-modal");
+  }
+
+  async function saveEdit(e) {
+    e.preventDefault();
+    const err = $("#pe-error");
+    const btn = $("#pe-submit");
+    const grade = $("#pe-grade").value;
+    const major = $("#pe-major").value.trim();
+    btn.disabled = true;
+    btn.textContent = "저장 중…";
+    err.textContent = "";
+    try {
+      await api("updatePlayer", { name: editName, grade, major, photo: editPhoto || undefined });
+      const o = loadOverlay();
+      o.edits.push({ name: editName, grade, major, photo: editPhoto, t: Date.now() });
+      saveOverlay(o);
+      rebuild();
+      render();
+      $("#player-edit-modal").close();
+      toast(`${editName} 프로필을 저장했어요.`);
+    } catch (ex) {
+      err.textContent = ex.message.includes("알 수 없는 요청")
+        ? "Apps Script를 새 코드로 업데이트해야 해요. (프로필 수정 기능)"
+        : ex.message;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "저장";
     }
   }
 
@@ -1259,6 +1368,22 @@
     });
     $("#save-game").addEventListener("click", saveGame);
 
+    // 프로필 편집 (운영자)
+    $("#pe-file").addEventListener("change", async (e) => {
+      const f = e.target.files[0];
+      if (!f) return;
+      $("#pe-error").textContent = "사진 줄이는 중…";
+      try {
+        editPhoto = await compressPhoto(f);
+        setEditPreview(editPhoto);
+        $("#pe-error").textContent = "";
+      } catch (ex) {
+        editPhoto = "";
+        $("#pe-error").textContent = ex.message;
+      }
+    });
+    $("#player-edit-form").addEventListener("submit", saveEdit);
+
     // 선수 추가 (운영자)
     $("#add-player").addEventListener("click", () => {
       $("#player-add-form").reset();
@@ -1311,5 +1436,5 @@
   initCalc();
   initAdmin();
   renderRules();
-  load();
+  load(true);
 })();
