@@ -449,8 +449,8 @@
   function renderRanking() {
     const q = state.search.trim().toLowerCase();
     const match = (s) => !q || s.name.toLowerCase().includes(q);
-    // 배치 중인 선수도 점수 순서대로 함께 보여줌 (순위 번호 없이 연한 회색)
-    const full = [...state.ranking, ...state.placing].sort(cmpStanding);
+    // 배치를 마친 선수가 위, 배치 중인 선수는 맨 아래 (각각 점수 순, 배치 중은 순위 번호 없이 연한 회색)
+    const full = [...state.ranking, ...[...state.placing].sort(cmpStanding)];
     let list = full.filter(match);
     const body = $("#rank-body");
     const more = $("#more");
