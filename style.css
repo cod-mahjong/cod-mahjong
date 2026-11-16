@@ -594,7 +594,7 @@ body.admin .edit-btn.admin-only { display: inline-block !important; }
 /* 스안커: 고래와 파도 — 남색 → 청록, 금빛 선 */
 .title-badge.t-yaku.y-suanko {
   background: linear-gradient(120deg, #0b1f4d 0%, #143f78 38%, #1f8ea3 72%, #8fe0d6 100%);
-  border-color: #d9b45a;
+  border-color: #ffffff;
 }
 /* 대삼원: 밤하늘 성운 — 보랏빛 남색 → 주황 금빛 */
 .title-badge.t-yaku.y-daisangen {
