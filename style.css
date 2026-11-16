@@ -616,10 +616,10 @@ body.admin .edit-btn.admin-only { display: inline-block !important; }
   background: linear-gradient(120deg, #2b1d10 0%, #7a4a0e 28%, #e0a21a 58%, #ffd84a 80%, #fff3b0 100%);
   border-color: #ffe27a;
 }
-/* 녹일색: 대나무 숲 — 짙은 숲색 → 청록 → 연둣빛 */
+/* 녹일색: 대나무 숲과 흰 새 — 순수한 초록 (짙은 녹색 → 잎사귀 녹색 → 연두), 흰 테두리 */
 .title-badge.t-yaku.y-ryuiso {
-  background: linear-gradient(120deg, #0d2e1f 0%, #1b5e3f 35%, #2f8f6c 65%, #a9d98a 100%);
-  border-color: #e8d48a;
+  background: linear-gradient(120deg, #0f3d1a 0%, #23762f 35%, #4fae3c 65%, #c8eb8a 100%);
+  border-color: #ffffff;
 }
 /* 청노두: 용과 붉은 소용돌이 — 보랏빛 붉은색 → 주홍 → 분홍빛 금 */
 .title-badge.t-yaku.y-chinroto {
@@ -631,10 +631,15 @@ body.admin .edit-btn.admin-only { display: inline-block !important; }
   background: linear-gradient(110deg, #e8721c 0%, #f5c33b 25%, #9cc46a 48%, #2f6fa8 72%, #172a63 100%);
   border-color: #ffe08a;
 }
-/* 구련보등: 밤의 연꽃 등불 — 짙은 청록 → 녹색 → 연꽃 빛 */
+/* 구련보등: 밤의 연꽃 등불 — 남빛 밤 → 짙은 청록 → 주황 등불 금빛 */
 .title-badge.t-yaku.y-churen {
-  background: linear-gradient(120deg, #0b1f24 0%, #164a4a 35%, #2f7d63 62%, #c9e58a 88%, #f6f7c8 100%);
-  border-color: #e6f2a8;
+  background: linear-gradient(120deg, #081626 0%, #12354a 35%, #1d5f6b 58%, #d98a3a 84%, #ffd98a 100%);
+  border-color: #f3c46a;
+}
+/* 스깡쯔: 보랏빛 밤과 요괴 빛 — 남보라 → 보라 → 자홍 → 연분홍, 도리이 빨간 테두리 */
+.title-badge.t-yaku.y-sukantsu {
+  background: linear-gradient(120deg, #140c2a 0%, #3b2466 32%, #8a2f8f 58%, #e04aa8 80%, #f7c2e6 100%);
+  border-color: #e0303f;
 }
 .title-badge.t-yaku[class*=" y-"]::after {
   content: ""; position: absolute; top: 0; bottom: 0; left: -60%; width: 40%;
