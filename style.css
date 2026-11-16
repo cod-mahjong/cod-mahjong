@@ -585,8 +585,7 @@ body.admin .edit-btn.admin-only { display: inline-block !important; }
 .title-badge.t-silver { background: #f7f8f9; color: #555f66; border-color: #aab4ba; border-style: dashed; }
 .title-badge.t-yaku { background: #1a1a1a; color: #fff; border-color: var(--red); }
 /* 작혼 역만 연출 색감 칭호 — 그라데이션 배경 + 금빛 테두리 + 빛이 지나가는 효과 */
-.title-badge.t-yaku.y-suanko, .title-badge.t-yaku.y-daisangen,
-.title-badge.t-yaku.y-tsuiiso, .title-badge.t-yaku.y-sushi {
+.title-badge.t-yaku[class*=" y-"] {
   position: relative; overflow: hidden; border-width: 1.5px; color: #fff;
   font-size: 12.5px; padding: 6px 12px; letter-spacing: .3px;
   text-shadow: 0 1px 2px rgba(0,0,0,.55);
@@ -612,8 +611,32 @@ body.admin .edit-btn.admin-only { display: inline-block !important; }
   background: linear-gradient(120deg, #2a0807 0%, #7d1a0d 30%, #d9561a 62%, #ffb431 85%, #ffe28a 100%);
   border-color: #ffb84a;
 }
-.title-badge.t-yaku.y-suanko::after, .title-badge.t-yaku.y-daisangen::after,
-.title-badge.t-yaku.y-tsuiiso::after, .title-badge.t-yaku.y-sushi::after {
+/* 국사무쌍: 금빛 태양 + 먹빛 불꽃 */
+.title-badge.t-yaku.y-kokushi {
+  background: linear-gradient(120deg, #2b1d10 0%, #7a4a0e 28%, #e0a21a 58%, #ffd84a 80%, #fff3b0 100%);
+  border-color: #ffe27a;
+}
+/* 녹일색: 대나무 숲 — 짙은 숲색 → 청록 → 연둣빛 */
+.title-badge.t-yaku.y-ryuiso {
+  background: linear-gradient(120deg, #0d2e1f 0%, #1b5e3f 35%, #2f8f6c 65%, #a9d98a 100%);
+  border-color: #e8d48a;
+}
+/* 청노두: 용과 붉은 소용돌이 — 보랏빛 붉은색 → 주홍 → 분홍빛 금 */
+.title-badge.t-yaku.y-chinroto {
+  background: linear-gradient(120deg, #3a0f2e 0%, #8e1f36 32%, #e0582c 62%, #f6b3a0 85%, #fff0d0 100%);
+  border-color: #fff4e0;
+}
+/* 지화: 해와 달 — 주황·노랑 → 연두 → 밤 파랑 */
+.title-badge.t-yaku.y-chiho {
+  background: linear-gradient(110deg, #e8721c 0%, #f5c33b 25%, #9cc46a 48%, #2f6fa8 72%, #172a63 100%);
+  border-color: #ffe08a;
+}
+/* 구련보등: 밤의 연꽃 등불 — 짙은 청록 → 녹색 → 연꽃 빛 */
+.title-badge.t-yaku.y-churen {
+  background: linear-gradient(120deg, #0b1f24 0%, #164a4a 35%, #2f7d63 62%, #c9e58a 88%, #f6f7c8 100%);
+  border-color: #e6f2a8;
+}
+.title-badge.t-yaku[class*=" y-"]::after {
   content: ""; position: absolute; top: 0; bottom: 0; left: -60%; width: 40%;
   background: linear-gradient(100deg, transparent, rgba(255,255,255,.55), transparent);
   transform: skewX(-20deg); animation: yaku-shine 3.2s ease-in-out infinite;

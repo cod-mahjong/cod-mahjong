@@ -366,7 +366,11 @@
     C.titles || {}
   );
   // 작혼 역만 연출 색감을 딴 칭호 디자인 (없으면 기본 검정+빨강)
-  const YAKU_STYLE = { "스안커": "suanko", "스안커 단기": "suanko", "대삼원": "daisangen", "자일색": "tsuiiso", "소사희": "sushi", "대사희": "sushi" };
+  const YAKU_STYLE = {
+    "스안커": "suanko", "스안커 단기": "suanko", "대삼원": "daisangen", "자일색": "tsuiiso", "소사희": "sushi", "대사희": "sushi",
+    "국사무쌍": "kokushi", "국사무쌍 13면 대기": "kokushi", "녹일색": "ryuiso", "청노두": "chinroto", "지화": "chiho",
+    "구련보등": "churen", "순정구련보등": "churen",
+  };
   const yakuKind = (y) => "yaku" + (YAKU_STYLE[y] ? " y-" + YAKU_STYLE[y] : "");
   const YAKUMAN = ["국사무쌍", "스안커", "대삼원", "소사희", "대사희", "자일색", "녹일색", "청노두", "구련보등", "스깡쯔", "천화", "지화",
     "국사무쌍 13면 대기", "스안커 단기", "순정구련보등"];
