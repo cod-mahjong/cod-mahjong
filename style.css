@@ -550,8 +550,6 @@ body.admin .edit-btn.admin-only { display: inline-block !important; }
 .title-badge.t-gold { background: #fffaf0; color: #8a6100; border-color: #e3b341; border-style: dashed; }
 .title-badge.t-silver { background: #f7f8f9; color: #555f66; border-color: #aab4ba; border-style: dashed; }
 .title-badge.t-yaku { background: #1a1a1a; color: #fff; border-color: var(--red); }
-.title-inline { display: inline-flex; gap: 4px; margin-left: 8px; vertical-align: 2px; }
-.title-inline .title-badge { font-size: 10.5px; padding: 3px 7px; }
 .pm-titles { margin: 0 0 14px; }
 .chip-x { background: none; border: 0; color: inherit; cursor: pointer; font-size: 11px; padding: 0 0 0 2px; opacity: .8; }
 .pe-yaku-row { display: flex; gap: 8px; margin-top: 8px; }

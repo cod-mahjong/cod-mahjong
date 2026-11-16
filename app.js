@@ -494,7 +494,7 @@
         return `
         <div class="rank-row" data-player="${esc(s.name)}">
           <span class="badge ${badge}">${s.place}</span>
-          <span class="rk-name">${avatar(s.name)}<span class="rk-text">${esc(s.name)}<span class="title-inline hide-sm">${titleBadges(s.name)}</span><small>평균 ${s.avgRank.toFixed(2)}위 · ${s.ranks.join("-")}</small></span></span>
+          <span class="rk-name">${avatar(s.name)}<span class="rk-text">${esc(s.name)}<small>평균 ${s.avgRank.toFixed(2)}위 · ${s.ranks.join("-")}</small></span></span>
           <span class="rk-pt">${fmtTotal(s.pt)}pt<small>(${fmtPt(s.pt)})</small></span>
           <span class="rk-diff">${diff}</span>
           <span class="rk-games hide-sm">${s.games}</span>
