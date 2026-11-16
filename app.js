@@ -362,13 +362,13 @@
 
   // ---------- 칭호 ----------
   const T = Object.assign(
-    { rank: ["종합 1위", "종합 2위", "종합 3위"], best: "최고 점수왕", avoid: "철벽", tops: "탑 머신", avg: "안정왕", yakuman: "역만" },
+    { rank: ["종합 1위", "종합 2위", "종합 3위"], yakuman: "역만" },
     C.titles || {}
   );
   const YAKUMAN = ["국사무쌍", "스안커", "대삼원", "소사희", "대사희", "자일색", "녹일색", "청노두", "구련보등", "스깡쯔", "천화", "지화",
     "국사무쌍 13면 대기", "스안커 단기", "순정구련보등"];
 
-  /** 이름 → [{text, kind}] — 배치를 마친 선수만 자동 칭호, 역만은 운영자가 단 칭호 */
+  /** 이름 → [{text, kind}] — 종합 1~3위(배치를 마친 선수)는 자동, 역만은 운영자가 단 칭호 */
   function computeTitles() {
     const map = new Map();
     const add = (name, text, kind) => {
@@ -377,18 +377,6 @@
     };
     const ranked = state.ranking;
     ranked.forEach((s) => { if (s.place <= 3) add(s.name, T.rank[s.place - 1], "r" + s.place); });
-    if (ranked.length) {
-      const leaders = (val, better) => {
-        const top = ranked.reduce((m, s) => (better(val(s), m) ? val(s) : m), val(ranked[0]));
-        return ranked.filter((s) => val(s) === top);
-      };
-      const hi = (a, b) => a > b, lo = (a, b) => a < b;
-      leaders((s) => s.best, hi).forEach((s) => add(s.name, T.best, "rec"));
-      leaders((s) => (s.games - s.ranks[3]) / s.games, hi).forEach((s) => add(s.name, T.avoid, "rec"));
-      const topCount = Math.max(...ranked.map((s) => s.ranks[0]));
-      if (topCount > 0) ranked.filter((s) => s.ranks[0] === topCount).forEach((s) => add(s.name, T.tops, "rec"));
-      leaders((s) => s.avgRank, lo).forEach((s) => add(s.name, T.avg, "rec"));
-    }
     state.rosterInfo.forEach((p, name) => (p.titles || []).forEach((y) => add(name, `${T.yakuman} · ${y}`, "yaku")));
     return map;
   }

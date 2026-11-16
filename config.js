@@ -29,13 +29,9 @@ window.CONFIG = {
   // apps-script/Code.gs 를 시트에 설치·배포한 뒤 나온 URL을 넣으세요. 비워두면 운영자 모드 꺼짐.
   adminApiUrl: "https://script.google.com/macros/s/AKfycbzSj_ZLuJhQA9q6qnL-_J48HfQr9tuv7K7y6wUKfRZPK5noT9HwIj5Ifl6n9jsXL8-7rw/exec",
 
-  // 칭호 이름 (자동 칭호는 배치를 마친 선수 중에서 계산, 역만은 운영자가 프로필 편집에서 부여)
+  // 칭호 이름 (종합 1~3위는 배치를 마친 선수 중 자동, 역만은 운영자가 프로필 편집에서 부여)
   titles: {
     rank: ["종합 1위", "종합 2위", "종합 3위"],
-    best: "최고 점수왕",   // 개인 기록: 최고 점수 1위
-    avoid: "철벽",         // 개인 기록: 4위 회피율 1위
-    tops: "탑 머신",       // 개인 기록: 최다 1위
-    avg: "안정왕",         // 개인 기록: 평균 순위 1위
     yakuman: "역만",
   },
 
