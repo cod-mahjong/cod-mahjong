@@ -437,7 +437,12 @@
       .map((i) => top[i] || i + 1)
       .map((s, i) => typeof s === "number" ? empty(s) : `
         <div class="pcard r${s.place} slot${i + 1}" data-player="${esc(s.name)}">
-          <div class="pcard-body"><div class="pcard-rank">${s.place}<small>위</small></div></div>
+          <div class="pcard-body">
+            <!-- 프로필 사진을 흐리게 깐 배경 + 가운데 선명한 프로필 사진 -->
+            <div class="pcard-bg"${photoStyle(s.name)}></div>
+            <span class="pcard-rankchip">${s.place}<small>위</small></span>
+            <div class="pcard-photo${photoUrl(s.name) ? " has-photo" : ""}"${photoStyle(s.name)}></div>
+          </div>
           <div class="pcard-foot">
             <div class="pcard-name">${esc(s.name)}</div>
             <div class="pcard-pt">${fmtTotal(s.pt)}pt <span class="pcard-delta">(${fmtPt(s.pt)})</span> · ${s.games}국</div>
