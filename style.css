@@ -547,6 +547,8 @@ body.admin .edit-btn.admin-only { display: inline-block !important; }
 .title-badge.t-r1 { background: #fff4d6; color: #8a6100; border-color: #e3b341; }
 .title-badge.t-r2 { background: #eef1f3; color: #555f66; border-color: #aab4ba; }
 .title-badge.t-r3 { background: #f8ece2; color: #8a4f1f; border-color: #c98a55; }
+.title-badge.t-gold { background: #fffaf0; color: #8a6100; border-color: #e3b341; border-style: dashed; }
+.title-badge.t-silver { background: #f7f8f9; color: #555f66; border-color: #aab4ba; border-style: dashed; }
 .title-badge.t-yaku { background: #1a1a1a; color: #fff; border-color: var(--red); }
 .title-inline { display: inline-flex; gap: 4px; margin-left: 8px; vertical-align: 2px; }
 .title-inline .title-badge { font-size: 10.5px; padding: 3px 7px; }

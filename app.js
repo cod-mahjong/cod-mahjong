@@ -362,13 +362,21 @@
 
   // ---------- 칭호 ----------
   const T = Object.assign(
-    { rank: ["종합 1위", "종합 2위", "종합 3위"], yakuman: "역만" },
+    { rank: ["종합 1위", "종합 2위", "종합 3위"], medals: ["금", "은"], yakuman: "역만" },
     C.titles || {}
   );
   const YAKUMAN = ["국사무쌍", "스안커", "대삼원", "소사희", "대사희", "자일색", "녹일색", "청노두", "구련보등", "스깡쯔", "천화", "지화",
     "국사무쌍 13면 대기", "스안커 단기", "순정구련보등"];
 
-  /** 이름 → [{text, kind}] — 종합 1~3위(배치를 마친 선수)는 자동, 역만은 운영자가 단 칭호 */
+  // 개인 기록 칭호: 각 기록의 1위 '금', 2위 '은' (예: "최고 점수 · 금")
+  const RECORD_TITLES = [
+    { label: "최고 점수", val: (s) => s.best, higher: true },
+    { label: "4위 회피율", val: (s) => (s.games - s.ranks[3]) / s.games, higher: true },
+    { label: "최다 1위", val: (s) => s.ranks[0], higher: true, needPositive: true },
+    { label: "평균 순위", val: (s) => s.avgRank, higher: false },
+  ];
+
+  /** 이름 → [{text, kind}] — 종합 1~3위·개인 기록 금/은(배치를 마친 선수)은 자동, 역만은 운영자가 단 칭호 */
   function computeTitles() {
     const map = new Map();
     const add = (name, text, kind) => {
@@ -377,6 +385,19 @@
     };
     const ranked = state.ranking;
     ranked.forEach((s) => { if (s.place <= 3) add(s.name, T.rank[s.place - 1], "r" + s.place); });
+    // 개인 기록 표와 같은 순위 규칙 (동점은 같은 순위, 다음 순위는 건너뜀)
+    RECORD_TITLES.forEach((r) => {
+      const list = ranked
+        .map((s) => ({ name: s.name, v: r.val(s) }))
+        .filter((x) => !r.needPositive || x.v > 0)
+        .sort((a, b) => (r.higher ? b.v - a.v : a.v - b.v));
+      let prev = null, place = 0;
+      list.forEach((x, i) => {
+        place = prev !== null && x.v === prev ? place : i + 1;
+        prev = x.v;
+        if (place <= T.medals.length) add(x.name, `${r.label} · ${T.medals[place - 1]}`, place === 1 ? "gold" : "silver");
+      });
+    });
     state.rosterInfo.forEach((p, name) => (p.titles || []).forEach((y) => add(name, `${T.yakuman} · ${y}`, "yaku")));
     return map;
   }
