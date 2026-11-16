@@ -584,7 +584,7 @@ body.admin .edit-btn.admin-only { display: inline-block !important; }
 .title-badge.t-gold { background: #fffaf0; color: #8a6100; border-color: #e3b341; border-style: dashed; }
 .title-badge.t-silver { background: #f7f8f9; color: #555f66; border-color: #aab4ba; border-style: dashed; }
 .title-badge.t-yaku { background: #1a1a1a; color: #fff; border-color: var(--red); }
-/* 작혼 역만 연출 색감 칭호 — 그라데이션 배경 + 금빛 테두리 + 빛이 지나가는 효과 */
+/* 작혼 역만 연출 색감 칭호 — 그라데이션 배경 + 금빛 테두리 */
 .title-badge.t-yaku[class*=" y-"] {
   position: relative; overflow: hidden; border-width: 1.5px; color: #fff;
   font-size: 12.5px; padding: 6px 12px; letter-spacing: .3px;
@@ -641,16 +641,7 @@ body.admin .edit-btn.admin-only { display: inline-block !important; }
   background: linear-gradient(120deg, #140c2a 0%, #3b2466 32%, #8a2f8f 58%, #e04aa8 80%, #f7c2e6 100%);
   border-color: #e0303f;
 }
-.title-badge.t-yaku[class*=" y-"]::after {
-  content: ""; position: absolute; top: 0; bottom: 0; left: -60%; width: 40%;
-  background: linear-gradient(100deg, transparent, rgba(255,255,255,.55), transparent);
-  transform: skewX(-20deg); animation: yaku-shine 3.2s ease-in-out infinite;
-  pointer-events: none;
-}
-@keyframes yaku-shine { 0%, 55% { left: -60%; } 100% { left: 140%; } }
-@media (prefers-reduced-motion: reduce) {
-  .title-badge.t-yaku::after { animation: none; display: none; }
-}
+
 .pm-titles { margin: 0 0 14px; }
 .chip-x { background: none; border: 0; color: inherit; cursor: pointer; font-size: 11px; padding: 0 0 0 2px; opacity: .8; }
 .pe-yaku-row { display: flex; gap: 8px; margin-top: 8px; }
