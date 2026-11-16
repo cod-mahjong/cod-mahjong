@@ -584,6 +584,45 @@ body.admin .edit-btn.admin-only { display: inline-block !important; }
 .title-badge.t-gold { background: #fffaf0; color: #8a6100; border-color: #e3b341; border-style: dashed; }
 .title-badge.t-silver { background: #f7f8f9; color: #555f66; border-color: #aab4ba; border-style: dashed; }
 .title-badge.t-yaku { background: #1a1a1a; color: #fff; border-color: var(--red); }
+/* 작혼 역만 연출 색감 칭호 — 그라데이션 배경 + 금빛 테두리 + 빛이 지나가는 효과 */
+.title-badge.t-yaku.y-suanko, .title-badge.t-yaku.y-daisangen,
+.title-badge.t-yaku.y-tsuiiso, .title-badge.t-yaku.y-sushi {
+  position: relative; overflow: hidden; border-width: 1.5px; color: #fff;
+  font-size: 12.5px; padding: 6px 12px; letter-spacing: .3px;
+  text-shadow: 0 1px 2px rgba(0,0,0,.55);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 2px 8px rgba(0,0,0,.25);
+}
+/* 스안커: 고래와 파도 — 남색 → 청록, 금빛 선 */
+.title-badge.t-yaku.y-suanko {
+  background: linear-gradient(120deg, #0b1f4d 0%, #143f78 38%, #1f8ea3 72%, #8fe0d6 100%);
+  border-color: #d9b45a;
+}
+/* 대삼원: 밤하늘 성운 — 보랏빛 남색 → 주황 금빛 */
+.title-badge.t-yaku.y-daisangen {
+  background: linear-gradient(120deg, #1a1540 0%, #3e2c74 36%, #b4569a 62%, #f08a3c 82%, #ffd66b 100%);
+  border-color: #f2c76a;
+}
+/* 자일색: 용과 불꽃 — 진홍 → 주홍 → 금빛 */
+.title-badge.t-yaku.y-tsuiiso {
+  background: linear-gradient(120deg, #3d0a12 0%, #a3201e 35%, #e5532a 68%, #ffcf7a 100%);
+  border-color: #fff0c4;
+}
+/* 소사희·대사희: 불사조 — 검붉은색 → 주황 → 황금 불꽃 */
+.title-badge.t-yaku.y-sushi {
+  background: linear-gradient(120deg, #2a0807 0%, #7d1a0d 30%, #d9561a 62%, #ffb431 85%, #ffe28a 100%);
+  border-color: #ffb84a;
+}
+.title-badge.t-yaku.y-suanko::after, .title-badge.t-yaku.y-daisangen::after,
+.title-badge.t-yaku.y-tsuiiso::after, .title-badge.t-yaku.y-sushi::after {
+  content: ""; position: absolute; top: 0; bottom: 0; left: -60%; width: 40%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.55), transparent);
+  transform: skewX(-20deg); animation: yaku-shine 3.2s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes yaku-shine { 0%, 55% { left: -60%; } 100% { left: 140%; } }
+@media (prefers-reduced-motion: reduce) {
+  .title-badge.t-yaku::after { animation: none; display: none; }
+}
 .pm-titles { margin: 0 0 14px; }
 .chip-x { background: none; border: 0; color: inherit; cursor: pointer; font-size: 11px; padding: 0 0 0 2px; opacity: .8; }
 .pe-yaku-row { display: flex; gap: 8px; margin-top: 8px; }

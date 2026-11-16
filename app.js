@@ -365,6 +365,9 @@
     { rank: ["종합 1위", "종합 2위", "종합 3위"], medals: ["금", "은"], yakuman: "역만" },
     C.titles || {}
   );
+  // 작혼 역만 연출 색감을 딴 칭호 디자인 (없으면 기본 검정+빨강)
+  const YAKU_STYLE = { "스안커": "suanko", "스안커 단기": "suanko", "대삼원": "daisangen", "자일색": "tsuiiso", "소사희": "sushi", "대사희": "sushi" };
+  const yakuKind = (y) => "yaku" + (YAKU_STYLE[y] ? " y-" + YAKU_STYLE[y] : "");
   const YAKUMAN = ["국사무쌍", "스안커", "대삼원", "소사희", "대사희", "자일색", "녹일색", "청노두", "구련보등", "스깡쯔", "천화", "지화",
     "국사무쌍 13면 대기", "스안커 단기", "순정구련보등"];
 
@@ -398,7 +401,7 @@
         if (place <= T.medals.length) add(x.name, `${r.label} · ${T.medals[place - 1]}`, place === 1 ? "gold" : "silver");
       });
     });
-    state.rosterInfo.forEach((p, name) => (p.titles || []).forEach((y) => add(name, `${T.yakuman} · ${y}`, "yaku")));
+    state.rosterInfo.forEach((p, name) => (p.titles || []).forEach((y) => add(name, `${T.yakuman} · ${y}`, yakuKind(y))));
     return map;
   }
 
@@ -1197,7 +1200,7 @@
 
   function renderEditTitles() {
     $("#pe-titles").innerHTML = editTitles.length
-      ? editTitles.map((t, i) => `<span class="title-badge t-yaku">${T.yakuman} · ${esc(t)}<button type="button" class="chip-x" data-rm-title="${i}" aria-label="삭제">✕</button></span>`).join("")
+      ? editTitles.map((t, i) => `<span class="title-badge t-${yakuKind(t)}">${T.yakuman} · ${esc(t)}<button type="button" class="chip-x" data-rm-title="${i}" aria-label="삭제">✕</button></span>`).join("")
       : `<span class="muted-txt">아직 없음</span>`;
   }
 
