@@ -733,14 +733,14 @@
       <h4 class="pm-sec">게임 기록 <small>총 ${s.games}국 · 최신순</small></h4>
       <div class="pm-scroll">
         <table class="pm-table">
-          <thead><tr><th>날짜</th><th class="c hide-sm">자리</th><th class="c">순위</th><th class="r">점수</th><th class="r">pt</th><th class="r hide-sm">보유 점수</th></tr></thead>
+          <thead><tr><th>날짜</th><th class="c">자리</th><th class="c">순위</th><th class="r">점수</th><th class="r">pt</th><th class="r hide-sm">보유 점수</th></tr></thead>
           <tbody>
             ${[...s.history]
               .reverse()
               .map((h) => `
               <tr>
-                <td>${esc(h.short)} · ${h.no}게임</td>
-                <td class="c hide-sm">${SEATS[h.seat]}</td>
+                <td>${esc(h.short)}<span class="hide-sm"> · ${h.no}게임</span></td>
+                <td class="c">${SEATS[h.seat]}</td>
                 <td class="c"><span class="rk-dot r${h.rank}">${h.rank}</span></td>
                 <td class="r">${fmtScore(h.score)}</td>
                 <td class="r ${ptClass(h.pt)}"><b>${fmtPt(h.pt)}</b></td>
