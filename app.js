@@ -560,13 +560,13 @@
   function renderPlayers() {
     const el = $("#players-list");
     if (!el) return;
-    // 명단 순서대로, 명단에 없지만 대국 기록에 나온 선수는 뒤에 가나다순
+    // 명단 + 대국 기록에만 있는 선수, 전체를 가나다순으로 (새로 추가해도 자리를 찾아 들어감)
     const byName = new Map(state.all.map((s) => [s.name, s]));
     const extra = state.all
       .map((s) => s.name)
       .filter((n) => !state.rosterInfo.has(n))
       .sort((a, b) => a.localeCompare(b, "ko"));
-    const names = [...state.roster, ...extra];
+    const names = [...state.roster, ...extra].sort((a, b) => a.localeCompare(b, "ko"));
     $("#players-count").textContent = names.length ? `총 ${names.length}명` : "";
     if (!names.length) {
       el.innerHTML = `<div class="empty">아직 등록된 선수가 없어요.</div>`;
