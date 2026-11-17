@@ -711,6 +711,8 @@
     $("#pm-name").innerHTML = avatar(s.name) + `<span>${esc(s.place
       ? `${s.place}위 · ${s.name}`
       : `배치 중 ${s.games}/${MIN_GAMES} · ${s.name}`)}</span>`;
+    chartPlayer = s;
+    chartPage = { point: 0, rank: 0 };
     const titlesHtml = titleBadges(s.name) ? `<div class="title-row pm-titles">${titleBadges(s.name)}</div>` : "";
     if (!s.games) {
       $("#pm-body").innerHTML = titlesHtml + `<div class="empty">아직 대국 기록이 없어요.<br>${MIN_GAMES}판을 치면 랭킹에 올라가요.</div>`;
@@ -726,10 +728,8 @@
         <div class="stat"><div class="v">${fmtTotal(peak.cum)}</div><div class="k">탑레이트 (${esc(peak.short)} ${peak.no}게임)</div></div>
         <div class="stat"><div class="v">${top2.toFixed(0)}%</div><div class="k">연대율 (1·2위)</div></div>
       </div>
-      <h4 class="pm-sec">보유 점수 <small>최근 ${RECENT_N}국</small></h4>
-      ${pointSVG(s.history)}
-      <h4 class="pm-sec">최근 순위 <small>최근 ${RECENT_N}국</small></h4>
-      ${rankSVG(s.history)}
+      <div id="pm-chart-point">${chartBlock("point")}</div>
+      <div id="pm-chart-rank">${chartBlock("rank")}</div>
       <h4 class="pm-sec">게임 기록 <small>총 ${s.games}국 · 최신순</small></h4>
       <div class="pm-scroll">
         <table class="pm-table">
@@ -819,9 +819,32 @@
     .join("");
 
   /** 보유 점수 그래프: 초록 선 + 시작 점수 기준선 */
-  function pointSVG(history) {
+  // ---------- 그래프 페이지 (10국씩 이전/다음) ----------
+  let chartPlayer = null;
+  let chartPage = { point: 0, rank: 0 }; // 0 = 최근 10국, 1 = 그 이전 10국 …
+  const maxPage = (n) => Math.max(0, Math.ceil((n - RECENT_N) / RECENT_N));
+  const pageStart = (n, p) => Math.max(0, n - RECENT_N - RECENT_N * p);
+
+  function chartBlock(kind) {
+    const h = chartPlayer.history, n = h.length;
+    const p = Math.min(chartPage[kind], maxPage(n));
+    const start = pageStart(n, p);
+    const end = Math.min(n, start + RECENT_N);
+    const label = p === 0 ? `최근 ${RECENT_N}국` : `${start + 1}~${end}국째`;
+    const nav = n > RECENT_N
+      ? `<span class="chart-nav">
+           <button type="button" data-chart="${kind}" data-dir="1" ${p >= maxPage(n) ? "disabled" : ""} aria-label="이전 기록">‹</button>
+           <button type="button" data-chart="${kind}" data-dir="-1" ${p <= 0 ? "disabled" : ""} aria-label="최근 기록">›</button>
+         </span>`
+      : "";
+    const title = kind === "point" ? "보유 점수" : "최근 순위";
+    return `<h4 class="pm-sec">${title} <small>${label}</small>${nav}</h4>
+      ${kind === "point" ? pointSVG(h, start) : rankSVG(h, start)}`;
+  }
+
+  function pointSVG(history, start = Math.max(0, history.length - RECENT_N)) {
     fitChart();
-    const list = history.slice(-RECENT_N);
+    const list = history.slice(start, start + RECENT_N);
     const n = list.length;
     const H = 170, T = 14, B = 26, ph = H - T - B;
     const vals = list.map((h) => BASE + h.cum);
@@ -849,9 +872,9 @@
   }
 
   /** 최근 순위 그래프: 위가 1위, 아래가 4위. 점 색은 순위별, 안에 순위 숫자 */
-  function rankSVG(history) {
+  function rankSVG(history, start = Math.max(0, history.length - RECENT_N)) {
     fitChart();
-    const list = history.slice(-RECENT_N);
+    const list = history.slice(start, start + RECENT_N);
     const n = list.length;
     const H = 166, T = 34, B = 26;
     const y = (r) => T + ((r - 1) * (H - T - B)) / 3;
@@ -1185,6 +1208,14 @@
     $("#refresh").addEventListener("click", () => load(true));
 
     document.addEventListener("click", (e) => {
+      const cb = e.target.closest("[data-chart]");
+      if (cb && chartPlayer) {
+        const kind = cb.dataset.chart;
+        const n = chartPlayer.history.length;
+        chartPage[kind] = Math.min(maxPage(n), Math.max(0, chartPage[kind] + Number(cb.dataset.dir)));
+        $("#pm-chart-" + kind).innerHTML = chartBlock(kind);
+        return;
+      }
       const ed = e.target.closest("[data-edit]");
       if (ed) return openEdit(ed.dataset.edit);
       const del = e.target.closest("[data-del]");
