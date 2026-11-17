@@ -712,7 +712,7 @@
       ? `${s.place}위 · ${s.name}`
       : `배치 중 ${s.games}/${MIN_GAMES} · ${s.name}`)}</span>`;
     chartPlayer = s;
-    chartPage = { point: 0, rank: 0 };
+    chartPage = { point: lastBlock(s.history.length), rank: lastBlock(s.history.length) };
     const titlesHtml = titleBadges(s.name) ? `<div class="title-row pm-titles">${titleBadges(s.name)}</div>` : "";
     if (!s.games) {
       $("#pm-body").innerHTML = titlesHtml + `<div class="empty">아직 대국 기록이 없어요.<br>${MIN_GAMES}판을 치면 랭킹에 올라가요.</div>`;
@@ -821,20 +821,19 @@
   /** 보유 점수 그래프: 초록 선 + 시작 점수 기준선 */
   // ---------- 그래프 페이지 (10국씩 이전/다음) ----------
   let chartPlayer = null;
-  let chartPage = { point: 0, rank: 0 }; // 0 = 최근 10국, 1 = 그 이전 10국 …
-  const maxPage = (n) => Math.max(0, Math.ceil((n - RECENT_N) / RECENT_N));
-  const pageStart = (n, p) => Math.max(0, n - RECENT_N - RECENT_N * p);
+  // 10국 단위 고정 구간: 0 = 1~10국, 1 = 11~20국 … (처음엔 가장 최근 판이 들어 있는 구간)
+  let chartPage = { point: 0, rank: 0 };
+  const lastBlock = (n) => Math.max(0, Math.floor((n - 1) / RECENT_N));
 
   function chartBlock(kind) {
     const h = chartPlayer.history, n = h.length;
-    const p = Math.min(chartPage[kind], maxPage(n));
-    const start = pageStart(n, p);
-    const end = Math.min(n, start + RECENT_N);
-    const label = p === 0 ? `최근 ${RECENT_N}국` : `${start + 1}~${end}국째`;
+    const b = Math.min(Math.max(chartPage[kind], 0), lastBlock(n));
+    const start = b * RECENT_N;
+    const label = `${start + 1}~${start + RECENT_N}국`;
     const nav = n > RECENT_N
       ? `<span class="chart-nav">
-           <button type="button" data-chart="${kind}" data-dir="1" ${p >= maxPage(n) ? "disabled" : ""} aria-label="이전 기록">‹</button>
-           <button type="button" data-chart="${kind}" data-dir="-1" ${p <= 0 ? "disabled" : ""} aria-label="최근 기록">›</button>
+           <button type="button" data-chart="${kind}" data-dir="-1" ${b <= 0 ? "disabled" : ""} aria-label="이전 기록">‹</button>
+           <button type="button" data-chart="${kind}" data-dir="1" ${b >= lastBlock(n) ? "disabled" : ""} aria-label="다음 기록">›</button>
          </span>`
       : "";
     const title = kind === "point" ? "보유 점수" : "최근 순위";
@@ -1212,7 +1211,7 @@
       if (cb && chartPlayer) {
         const kind = cb.dataset.chart;
         const n = chartPlayer.history.length;
-        chartPage[kind] = Math.min(maxPage(n), Math.max(0, chartPage[kind] + Number(cb.dataset.dir)));
+        chartPage[kind] = Math.min(lastBlock(n), Math.max(0, chartPage[kind] + Number(cb.dataset.dir)));
         $("#pm-chart-" + kind).innerHTML = chartBlock(kind);
         return;
       }
