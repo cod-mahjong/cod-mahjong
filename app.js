@@ -577,7 +577,7 @@
             : `배치 중 ${s.games}/${MIN_GAMES} · ${fmtTotal(s.pt)}pt`;
         return `
         <article class="player-card" data-player="${esc(name)}">
-          <button class="edit-btn admin-only" data-edit="${esc(name)}">편집</button>
+          <button class="edit-btn" data-edit="${esc(name)}">편집</button>
           <div class="player-photo${photoUrl(name) ? " has-photo" : ""}"${photoStyle(name)} aria-hidden="true"></div>
           <div class="player-info">
             <h3 class="player-name">${esc(name)}${info.pending ? `<span class="pending-chip">반영 대기</span>` : ""}</h3>
@@ -1244,13 +1244,14 @@
   }
 
   function openEdit(name) {
-    if (!state.admin) return;
+    if (!C.adminApiUrl) return toast("프로필 편집을 쓸 수 없어요. (서버 주소 미설정)", true);
     const info = state.rosterInfo.get(name) || {};
     editName = name;
     editTitles = [...(info.titles || [])];
     renderEditTitles();
     editPhoto = "";
-    $("#pe-title").textContent = `프로필 편집 · ${name}`;
+    $("#pe-title").textContent = state.admin ? `관리자 편집 · ${name}` : `프로필 편집 · ${name}`;
+    $("#pe-yaku-field").classList.toggle("hidden", !state.admin); // 역만 칭호는 관리자만
     $("#pe-grade").value = info.grade || "";
     $("#pe-major").value = info.major || "";
     $("#pe-file").value = "";
@@ -1269,9 +1270,15 @@
     btn.textContent = "저장 중…";
     err.textContent = "";
     try {
-      await api("updatePlayer", { name: editName, grade, major, photo: editPhoto || undefined, titles: editTitles.join(",") });
+      const admin = state.admin;
+      if (admin) {
+        await api("updatePlayer", { name: editName, grade, major, photo: editPhoto || undefined, titles: editTitles.join(",") });
+      } else {
+        // 누구나: 비밀번호 없이 사진·학년·학과만 (서버에서 칭호는 바꿀 수 없게 막음)
+        await api("updateProfile", { name: editName, grade, major, photo: editPhoto || undefined }, "");
+      }
       const o = loadOverlay();
-      o.edits.push({ name: editName, grade, major, photo: editPhoto, titles: [...editTitles], t: Date.now() });
+      o.edits.push({ name: editName, grade, major, photo: editPhoto, ...(admin ? { titles: [...editTitles] } : {}), t: Date.now() });
       saveOverlay(o);
       rebuild();
       render();
@@ -1279,7 +1286,7 @@
       toast(`${editName} 프로필을 저장했어요.`);
     } catch (ex) {
       err.textContent = ex.message.includes("알 수 없는 요청")
-        ? "Apps Script를 새 코드로 업데이트해야 해요. (프로필 수정 기능)"
+        ? "Apps Script를 새 코드로 업데이트해야 해요. (프로필 편집 기능)"
         : ex.message;
     } finally {
       btn.disabled = false;

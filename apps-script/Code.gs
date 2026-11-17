@@ -21,6 +21,8 @@ function doPost(e) {
   try {
     try { locked = lock.tryLock(5000); } catch (e) { locked = false; }
     const req = JSON.parse((e && e.postData && e.postData.contents) || '{}');
+    // 누구나 쓸 수 있는 요청: 명단에 있는 선수의 프로필(사진·학년·학과)만 수정 — 칭호는 못 바꿈
+    if (req.action === 'updateProfile') return out(updateProfile_(req));
     if (String(req.password || '') !== ADMIN_PASSWORD) {
       return out({ ok: false, error: '비밀번호가 틀렸어요.' });
     }
@@ -164,6 +166,16 @@ function updatePlayer_(req) {
   if (photo) sh.getRange(row, 4).setValue(photo);
   if (titles !== null) sh.getRange(row, 5).setValue(titles);
   return { ok: true };
+}
+
+/** 비밀번호 없이 쓰는 프로필 수정: 명단에 이미 있는 선수만, 칭호(E열)는 건드리지 않음 */
+function updateProfile_(req) {
+  const name = String(req.name || '').trim();
+  const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(PLAYER_SHEET_NAME);
+  if (!sh) throw new Error("'" + PLAYER_SHEET_NAME + "' 시트를 찾지 못했어요.");
+  const names = sh.getRange(1, 1, Math.max(sh.getLastRow(), 1), 1).getValues().map(function (r) { return String(r[0]).trim(); });
+  if (!name || names.indexOf(name) < 1) throw new Error('명단에 없는 선수예요.');
+  return updatePlayer_({ name: name, grade: req.grade, major: req.major, photo: req.photo });
 }
 
 function out(obj) {

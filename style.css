@@ -555,7 +555,6 @@ body.admin .admin-hide { display: none !important; }
   background: #fff; color: var(--green); border: 2px solid var(--green);
 }
 .edit-btn:hover { background: var(--green); color: #fff; }
-body.admin .edit-btn.admin-only { display: inline-block !important; }
 .pe-photo-row { display: flex; align-items: center; gap: 18px; }
 .pe-photo-row .player-photo { width: 100px; height: 100px; flex-shrink: 0; }
 .pe-file-btn { display: inline-block; text-align: center; }
@@ -729,4 +728,4 @@ body.admin .edit-btn.admin-only { display: inline-block !important; }
   .pm-scroll .pm-table td, .pm-scroll .pm-table th { padding: 9px 6px; font-size: 13px; }
 }
 
-body.admin .player-info { padding-right: 72px; }
+.player-info { padding-right: 72px; }
