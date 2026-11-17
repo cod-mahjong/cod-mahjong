@@ -558,6 +558,9 @@ body.admin .admin-hide { display: none !important; }
 .pe-photo-row { display: flex; align-items: center; gap: 18px; }
 .pe-photo-row .player-photo { width: 100px; height: 100px; flex-shrink: 0; }
 .pe-file-btn { display: inline-block; text-align: center; }
+.pe-photo-btns { display: flex; flex-direction: column; gap: 8px; }
+.pe-remove-btn { color: var(--red); border-color: #f0b3b8; }
+.pe-remove-btn:hover { background: #fff3f4; }
 
 /* 칭호 */
 .title-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }

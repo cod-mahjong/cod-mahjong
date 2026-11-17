@@ -5,8 +5,9 @@
   /** 프로필 사진: img/players/<이름>.jpg 가 있으면 사진, 없으면 회색 실루엣 */
   const PHOTOS = new Set(window.PLAYER_PHOTOS || []);
   const photoUrl = (name) => {
-    const sheetPhoto = state.rosterInfo && state.rosterInfo.get(name)?.photo;
-    if (sheetPhoto) return sheetPhoto; // 운영자가 사이트에서 올린 사진 (시트 '선수' D열)
+    const info = state.rosterInfo && state.rosterInfo.get(name);
+    if (info?.noPhoto) return ""; // 사진 삭제됨 (시트 D열이 '-')
+    if (info?.photo) return info.photo; // 사이트에서 올린 사진 (시트 '선수' D열)
     return PHOTOS.has(name) ? `img/players/${encodeURIComponent(name)}.jpg` : "";
   };
   const photoStyle = (name) => (photoUrl(name) ? ` style="background-image:url('${photoUrl(name)}')"` : "");
@@ -274,6 +275,7 @@
         grade: (r[1] || "").trim(),
         major: (r[2] || "").trim(),
         photo: /^data:image\//.test((r[3] || "").trim()) ? r[3].trim() : "",
+        noPhoto: (r[3] || "").trim() === "-",
         titles: (r[4] || "").split(",").map((t) => t.trim()).filter(Boolean), // E열: 역만 칭호
       }))
       .filter((p, i) => p.name && !(i === 0 && /^(이름|선수|name)/i.test(p.name)))
@@ -291,13 +293,18 @@
     o.edits = o.edits.filter((e) => {
       const c = csvBy.get(e.name);
       return !(c && c.grade === e.grade && c.major === e.major && (!e.photo || c.photo === e.photo)
+        && (!e.removePhoto || c.noPhoto)
         && (e.titles === undefined || (c.titles || []).join(",") === e.titles.join(",")));
     });
     saveOverlay(o);
     const list = [...state.rosterCsv, ...o.players.map((p) => ({ ...p, pending: true }))].map((p) => {
       const e = o.edits.filter((x) => x.name === p.name).pop();
       return e
-        ? { ...p, grade: e.grade, major: e.major, photo: e.photo || p.photo, titles: e.titles ?? p.titles, pending: true }
+        ? {
+            ...p, grade: e.grade, major: e.major, titles: e.titles ?? p.titles, pending: true,
+            photo: e.removePhoto ? "" : e.photo || p.photo,
+            noPhoto: e.removePhoto ? true : e.photo ? false : p.noPhoto,
+          }
         : p;
     });
     state.roster = list.map((p) => p.name);
@@ -1200,7 +1207,7 @@
   }
 
   // ---------- 프로필 편집 (운영자) ----------
-  let editName = "", editPhoto = "", editTitles = [];
+  let editName = "", editPhoto = "", editTitles = [], editRemove = false;
 
   function renderEditTitles() {
     $("#pe-titles").innerHTML = editTitles.length
@@ -1241,6 +1248,7 @@
     const el = $("#pe-photo");
     el.classList.toggle("has-photo", !!src);
     el.style.backgroundImage = src ? `url('${src}')` : "";
+    $("#pe-remove").classList.toggle("hidden", !src); // 사진이 있을 때만 삭제 버튼
   }
 
   function openEdit(name) {
@@ -1250,6 +1258,7 @@
     editTitles = [...(info.titles || [])];
     renderEditTitles();
     editPhoto = "";
+    editRemove = false;
     $("#pe-title").textContent = state.admin ? `관리자 편집 · ${name}` : `프로필 편집 · ${name}`;
     $("#pe-yaku-field").classList.toggle("hidden", !state.admin); // 역만 칭호는 관리자만
     $("#pe-grade").value = info.grade || "";
@@ -1272,13 +1281,13 @@
     try {
       const admin = state.admin;
       if (admin) {
-        await api("updatePlayer", { name: editName, grade, major, photo: editPhoto || undefined, titles: editTitles.join(",") });
+        await api("updatePlayer", { name: editName, grade, major, photo: editPhoto || undefined, removePhoto: editRemove || undefined, titles: editTitles.join(",") });
       } else {
         // 누구나: 비밀번호 없이 사진·학년·학과만 (서버에서 칭호는 바꿀 수 없게 막음)
-        await api("updateProfile", { name: editName, grade, major, photo: editPhoto || undefined }, "");
+        await api("updateProfile", { name: editName, grade, major, photo: editPhoto || undefined, removePhoto: editRemove || undefined }, "");
       }
       const o = loadOverlay();
-      o.edits.push({ name: editName, grade, major, photo: editPhoto, ...(admin ? { titles: [...editTitles] } : {}), t: Date.now() });
+      o.edits.push({ name: editName, grade, major, photo: editPhoto, removePhoto: editRemove, ...(admin ? { titles: [...editTitles] } : {}), t: Date.now() });
       saveOverlay(o);
       rebuild();
       render();
@@ -1468,6 +1477,7 @@
       $("#pe-error").textContent = "사진 줄이는 중…";
       try {
         editPhoto = await compressPhoto(f);
+        editRemove = false;
         setEditPreview(editPhoto);
         $("#pe-error").textContent = "";
       } catch (ex) {
@@ -1476,6 +1486,12 @@
       }
     });
     $("#player-edit-form").addEventListener("submit", saveEdit);
+    $("#pe-remove").addEventListener("click", () => {
+      editPhoto = "";
+      editRemove = true;
+      $("#pe-file").value = "";
+      setEditPreview("");
+    });
 
     // 선수 추가 (운영자)
     $("#add-player").addEventListener("click", () => {

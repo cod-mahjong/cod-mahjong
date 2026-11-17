@@ -164,6 +164,7 @@ function updatePlayer_(req) {
   }
   sh.getRange(row, 2, 1, 2).setValues([[grade, major]]);
   if (photo) sh.getRange(row, 4).setValue(photo);
+  else if (req.removePhoto) sh.getRange(row, 4).setValue('-'); // 사진 삭제 표시
   if (titles !== null) sh.getRange(row, 5).setValue(titles);
   return { ok: true };
 }
@@ -175,7 +176,7 @@ function updateProfile_(req) {
   if (!sh) throw new Error("'" + PLAYER_SHEET_NAME + "' 시트를 찾지 못했어요.");
   const names = sh.getRange(1, 1, Math.max(sh.getLastRow(), 1), 1).getValues().map(function (r) { return String(r[0]).trim(); });
   if (!name || names.indexOf(name) < 1) throw new Error('명단에 없는 선수예요.');
-  return updatePlayer_({ name: name, grade: req.grade, major: req.major, photo: req.photo });
+  return updatePlayer_({ name: name, grade: req.grade, major: req.major, photo: req.photo, removePhoto: req.removePhoto });
 }
 
 function out(obj) {

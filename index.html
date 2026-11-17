@@ -22,7 +22,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Sans:wght@700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=20261117191759" />
+  <link rel="stylesheet" href="style.css?v=20261117192604" />
 </head>
 <body>
   <div class="frame" aria-hidden="true"></div>
@@ -212,7 +212,10 @@
     <form id="player-edit-form" class="admin-form">
       <div class="pe-photo-row">
         <div id="pe-photo" class="player-photo" aria-hidden="true"></div>
-        <label class="btn-outline pe-file-btn">사진 변경<input type="file" id="pe-file" accept="image/*" hidden /></label>
+        <div class="pe-photo-btns">
+          <label class="btn-outline pe-file-btn">사진 변경<input type="file" id="pe-file" accept="image/*" hidden /></label>
+          <button type="button" id="pe-remove" class="btn-outline pe-remove-btn">사진 삭제</button>
+        </div>
       </div>
       <label class="field">학년
         <select id="pe-grade">
@@ -256,8 +259,8 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="img/players/photos.js?v=20261117191759"></script>
-  <script src="config.js?v=20261117191759"></script>
-  <script src="app.js?v=20261117191759"></script>
+  <script src="img/players/photos.js?v=20261117192604"></script>
+  <script src="config.js?v=20261117192604"></script>
+  <script src="app.js?v=20261117192604"></script>
 </body>
 </html>
